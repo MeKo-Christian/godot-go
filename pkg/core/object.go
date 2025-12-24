@@ -2,6 +2,7 @@ package core
 
 // #include <godot/gdextension_interface.h>
 import "C"
+
 import (
 	"unsafe"
 

@@ -146,7 +146,7 @@ func (d ElseDirective) Eval(vars PreprocVars) string {
 }
 
 func ParsePreprocessorString(s string) (*PreprocessorHeaderFileAST, error) {
-	var preprocessorHeaderFileLexer = MustStateful(Rules{
+	preprocessorHeaderFileLexer := MustStateful(Rules{
 		"Root": {
 			{`Ifdef`, `#ifdef[ \t]+[a-zA-Z_][a-zA-Z0-9_]*`, Push("Root")},
 			{`Ifndef`, `#ifndef[ \t]+[a-zA-Z_][a-zA-Z0-9_]*`, Push("Root")},
@@ -168,13 +168,11 @@ func ParsePreprocessorString(s string) (*PreprocessorHeaderFileAST, error) {
 		directiveIdent("Ifdef", "Ifndef", "Define"),
 		directiveFilename("Include"),
 	)
-
 	if err != nil {
 		return nil, err
 	}
 
 	ast, err := parser.ParseString("", s)
-
 	if err != nil {
 		return nil, err
 	}

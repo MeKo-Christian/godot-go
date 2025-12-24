@@ -9,11 +9,9 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var (
-	legacyGDExtentionInterfaceFunctionNames []string = []string{
-		"GDExtensionInterfaceFunctionPtr",
-	}
-)
+var legacyGDExtentionInterfaceFunctionNames []string = []string{
+	"GDExtensionInterfaceFunctionPtr",
+}
 
 type CHeaderFileAST struct {
 	Expr []Expr `parser:" @@* " json:",omitempty"`
@@ -280,7 +278,7 @@ func (a Argument) ResolvedName(i int) string {
 }
 
 func ParseCString(s string) (CHeaderFileAST, error) {
-	var headerFileLexer = MustStateful(Rules{
+	headerFileLexer := MustStateful(Rules{
 		"Root": {
 			{`Typedef`, `typedef`, nil},
 			{`Struct`, `struct`, nil},
@@ -306,13 +304,11 @@ func ParseCString(s string) (CHeaderFileAST, error) {
 		participle.UseLookahead(20),
 		participle.Elide("Whitespace", "Comment"),
 	)
-
 	if err != nil {
 		return CHeaderFileAST{}, err
 	}
 
 	ast, err := parser.ParseString("", s)
-
 	if err != nil {
 		return CHeaderFileAST{}, err
 	}

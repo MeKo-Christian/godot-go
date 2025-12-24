@@ -8,6 +8,7 @@ package core
 // #include "gdextension_binding_init.h"
 // #include "stacktrace.h"
 import "C"
+
 import (
 	"unsafe"
 

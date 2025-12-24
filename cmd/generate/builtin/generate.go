@@ -69,7 +69,6 @@ func GenerateBuiltinClasses(projectPath string, extensionApi extensionapiparser.
 			"goEncodeIsReference":      goEncodeIsReference,
 		}).
 		Parse(builtinClassesText)
-
 	if err != nil {
 		return err
 	}
@@ -77,7 +76,6 @@ func GenerateBuiltinClasses(projectPath string, extensionApi extensionapiparser.
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -85,7 +83,6 @@ func GenerateBuiltinClasses(projectPath string, extensionApi extensionapiparser.
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("builtinclasses.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -93,7 +90,6 @@ func GenerateBuiltinClasses(projectPath string, extensionApi extensionapiparser.
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -111,7 +107,6 @@ func GenerateBuiltinClassBindings(projectPath string, extensionApi extensionapip
 			"goEncoder":         goEncoder,
 		}).
 		Parse(builtinClassesBindingsText)
-
 	if err != nil {
 		return err
 	}
@@ -119,7 +114,6 @@ func GenerateBuiltinClassBindings(projectPath string, extensionApi extensionapip
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -127,7 +121,6 @@ func GenerateBuiltinClassBindings(projectPath string, extensionApi extensionapip
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("builtinclasses.bindings.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -135,7 +128,6 @@ func GenerateBuiltinClassBindings(projectPath string, extensionApi extensionapip
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -154,7 +146,6 @@ func GenerateClassInterfaces(projectPath string, extensionApi extensionapiparser
 			"coalesce":             coalesce,
 		}).
 		Parse(classesInterfacesText)
-
 	if err != nil {
 		return err
 	}
@@ -162,7 +153,6 @@ func GenerateClassInterfaces(projectPath string, extensionApi extensionapiparser
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -170,7 +160,6 @@ func GenerateClassInterfaces(projectPath string, extensionApi extensionapiparser
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("classes.interfaces.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -178,7 +167,6 @@ func GenerateClassInterfaces(projectPath string, extensionApi extensionapiparser
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -193,7 +181,6 @@ func GenerateClassRefInterfaces(projectPath string, extensionApi extensionapipar
 			"goEncoder":            goEncoder,
 		}).
 		Parse(classesRefInterfacesText)
-
 	if err != nil {
 		return err
 	}
@@ -201,7 +188,6 @@ func GenerateClassRefInterfaces(projectPath string, extensionApi extensionapipar
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -209,7 +195,6 @@ func GenerateClassRefInterfaces(projectPath string, extensionApi extensionapipar
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("classes.ref.interfaces.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -217,7 +202,6 @@ func GenerateClassRefInterfaces(projectPath string, extensionApi extensionapipar
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}

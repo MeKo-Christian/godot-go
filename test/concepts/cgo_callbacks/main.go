@@ -13,6 +13,7 @@ static void * testfunc(void *user_data) {
 }
 */
 import "C"
+
 import (
 	"log"
 	"runtime/cgo"

@@ -7,6 +7,7 @@ package core
 // #include <stdio.h>
 // #include <stdlib.h>
 import "C"
+
 import (
 	"fmt"
 	"reflect"
@@ -24,7 +25,8 @@ import (
 func GoCallback_ClassCreationInfoToString(
 	p_instance C.GDExtensionClassInstancePtr,
 	r_is_valid *C.GDExtensionBool,
-	p_out C.GDExtensionStringPtr) {
+	p_out C.GDExtensionStringPtr,
+) {
 	wci := cgo.Handle(p_instance).Value().(*WrappedClassInstance)
 	if wci == nil {
 		log.Panic("wci should not be null")
@@ -224,7 +226,6 @@ func GoCallback_ClassCreationInfoValidateProperty(pInstance C.GDExtensionClassIn
 
 //export GoCallback_ClassCreationInfoNotification
 func GoCallback_ClassCreationInfoNotification(p_instance C.GDExtensionClassInstancePtr, p_what C.int32_t, p_reversed C.GDExtensionBool) {
-
 }
 
 //export GoCallback_ClassCreationInfoGet

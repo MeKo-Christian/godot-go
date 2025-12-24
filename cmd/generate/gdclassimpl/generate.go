@@ -2,12 +2,11 @@ package gdclassimpl
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
-
-	_ "embed"
 
 	"github.com/godot-go/godot-go/cmd/extensionapiparser"
 )
@@ -22,9 +21,7 @@ var (
 
 // Generate will generate Go wrappers for all Godot base types
 func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var (
-		err error
-	)
+	var err error
 	if err = GenerateClasses(projectPath, eapi); err != nil {
 		panic(err)
 	}
@@ -51,7 +48,6 @@ func GenerateClasses(projectPath string, extensionApi extensionapiparser.Extensi
 			"coalesce":             coalesce,
 		}).
 		Parse(classesText)
-
 	if err != nil {
 		return err
 	}
@@ -59,7 +55,6 @@ func GenerateClasses(projectPath string, extensionApi extensionapiparser.Extensi
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -67,7 +62,6 @@ func GenerateClasses(projectPath string, extensionApi extensionapiparser.Extensi
 	filename := filepath.Join(projectPath, "pkg", "gdclassimpl", fmt.Sprintf("classes.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -75,7 +69,6 @@ func GenerateClasses(projectPath string, extensionApi extensionapiparser.Extensi
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -101,7 +94,6 @@ func GenerateClassRefs(projectPath string, extensionApi extensionapiparser.Exten
 			"coalesce":             coalesce,
 		}).
 		Parse(classesRefsText)
-
 	if err != nil {
 		return err
 	}
@@ -109,7 +101,6 @@ func GenerateClassRefs(projectPath string, extensionApi extensionapiparser.Exten
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -117,7 +108,6 @@ func GenerateClassRefs(projectPath string, extensionApi extensionapiparser.Exten
 	filename := filepath.Join(projectPath, "pkg", "gdclassimpl", fmt.Sprintf("classes.refs.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -125,7 +115,6 @@ func GenerateClassRefs(projectPath string, extensionApi extensionapiparser.Exten
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}

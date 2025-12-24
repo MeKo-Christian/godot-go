@@ -11,9 +11,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var (
-	goReturnType = goArgumentType
-)
+var goReturnType = goArgumentType
 
 func goFormatFieldName(n string) string {
 	n = goArgumentName(n)
@@ -272,9 +270,7 @@ func goHasArgumentTypeEncoder(t string) bool {
 		t = t[8:]
 	}
 
-	var (
-		indirection int
-	)
+	var indirection int
 
 	if strings.HasSuffix(t, "**") {
 		indirection = 2
@@ -433,34 +429,32 @@ func nativeStructureFormatToFields(f string) string {
 	return sb.String()
 }
 
-var (
-	operatorIdName = map[string]string{
-		"==":     "equal",
-		"!=":     "not_equal",
-		"<":      "less",
-		"<=":     "less_equal",
-		">":      "greater",
-		">=":     "greater_equal",
-		"+":      "add",
-		"-":      "subtract",
-		"*":      "multiply",
-		"/":      "divide",
-		"unary-": "negate",
-		"unary+": "positive",
-		"%":      "module", // this seems like a mispelling, but it stems from gdextension_interface.h constant GDEXTENSION_VARIANT_OP_MODULE
-		"<<":     "shift_left",
-		">>":     "shift_right",
-		"&":      "bit_and",
-		"|":      "bit_or",
-		"^":      "bit_xor",
-		"~":      "bit_negate",
-		"and":    "and",
-		"or":     "or",
-		"xor":    "xor",
-		"not":    "not",
-		"in":     "in",
-	}
-)
+var operatorIdName = map[string]string{
+	"==":     "equal",
+	"!=":     "not_equal",
+	"<":      "less",
+	"<=":     "less_equal",
+	">":      "greater",
+	">=":     "greater_equal",
+	"+":      "add",
+	"-":      "subtract",
+	"*":      "multiply",
+	"/":      "divide",
+	"unary-": "negate",
+	"unary+": "positive",
+	"%":      "module", // this seems like a mispelling, but it stems from gdextension_interface.h constant GDEXTENSION_VARIANT_OP_MODULE
+	"<<":     "shift_left",
+	">>":     "shift_right",
+	"&":      "bit_and",
+	"|":      "bit_or",
+	"^":      "bit_xor",
+	"~":      "bit_negate",
+	"and":    "and",
+	"or":     "or",
+	"xor":    "xor",
+	"not":    "not",
+	"in":     "in",
+}
 
 func getOperatorIdName(op string) string {
 	return operatorIdName[op]
@@ -474,11 +468,9 @@ func upperFirstChar(n string) string {
 	return fmt.Sprintf("%s%s", strings.ToUpper(n[:1]), n[1:])
 }
 
-var (
-	needsCopySet = map[string]struct{}{
-		"Dictionary": {},
-	}
-)
+var needsCopySet = map[string]struct{}{
+	"Dictionary": {},
+}
 
 func goEncoder(goType string) string {
 	return upperFirstChar(goType) + "Encoder"

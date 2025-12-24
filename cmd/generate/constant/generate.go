@@ -2,12 +2,11 @@ package constant
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
-
-	_ "embed"
 
 	"github.com/godot-go/godot-go/cmd/extensionapiparser"
 )
@@ -28,9 +27,7 @@ var (
 
 // Generate will generate Go wrappers for all Godot base types
 func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var (
-		err error
-	)
+	var err error
 	if err = GenerateClassConstants(projectPath, eapi); err != nil {
 		panic(err)
 	}
@@ -60,7 +57,6 @@ func GenerateClassConstants(projectPath string, extensionApi extensionapiparser.
 			"coalesce":             coalesce,
 		}).
 		Parse(classesConstantsText)
-
 	if err != nil {
 		return err
 	}
@@ -68,7 +64,6 @@ func GenerateClassConstants(projectPath string, extensionApi extensionapiparser.
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -76,7 +71,6 @@ func GenerateClassConstants(projectPath string, extensionApi extensionapiparser.
 	filename := filepath.Join(projectPath, "pkg", "constant", fmt.Sprintf("classes.constants.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -84,7 +78,6 @@ func GenerateClassConstants(projectPath string, extensionApi extensionapiparser.
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -106,7 +99,6 @@ func GenerateClassEnums(projectPath string, extensionApi extensionapiparser.Exte
 			"coalesce":             coalesce,
 		}).
 		Parse(classesEnumsText)
-
 	if err != nil {
 		return err
 	}
@@ -114,7 +106,6 @@ func GenerateClassEnums(projectPath string, extensionApi extensionapiparser.Exte
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -122,7 +113,6 @@ func GenerateClassEnums(projectPath string, extensionApi extensionapiparser.Exte
 	filename := filepath.Join(projectPath, "pkg", "constant", fmt.Sprintf("classes.enums.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -130,7 +120,6 @@ func GenerateClassEnums(projectPath string, extensionApi extensionapiparser.Exte
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -145,7 +134,6 @@ func GenerateGlobalConstants(projectPath string, extensionApi extensionapiparser
 
 	tmpl, err := template.New("globalconstants.gen.go").
 		Parse(globalConstantsText)
-
 	if err != nil {
 		return err
 	}
@@ -153,7 +141,6 @@ func GenerateGlobalConstants(projectPath string, extensionApi extensionapiparser
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -161,7 +148,6 @@ func GenerateGlobalConstants(projectPath string, extensionApi extensionapiparser
 	filename := filepath.Join(projectPath, "pkg", "constant", fmt.Sprintf("globalconstants.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -169,7 +155,6 @@ func GenerateGlobalConstants(projectPath string, extensionApi extensionapiparser
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -184,7 +169,6 @@ func GenerateGlobalEnums(projectPath string, extensionApi extensionapiparser.Ext
 
 	tmpl, err := template.New("globalenums.gen.go").
 		Parse(globalEnumsText)
-
 	if err != nil {
 		return err
 	}
@@ -192,7 +176,6 @@ func GenerateGlobalEnums(projectPath string, extensionApi extensionapiparser.Ext
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -200,7 +183,6 @@ func GenerateGlobalEnums(projectPath string, extensionApi extensionapiparser.Ext
 	filename := filepath.Join(projectPath, "pkg", "constant", fmt.Sprintf("globalenums.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -208,7 +190,6 @@ func GenerateGlobalEnums(projectPath string, extensionApi extensionapiparser.Ext
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}

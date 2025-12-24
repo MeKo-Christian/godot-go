@@ -1,6 +1,7 @@
 package gdclassinit
 
 import "C"
+
 import (
 	"unsafe"
 

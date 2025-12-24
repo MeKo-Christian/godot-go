@@ -9,14 +9,13 @@ package ffi
 #include <string.h>
 */
 import "C"
+
 import (
 	"runtime"
 	// "github.com/CannibalVox/cgoalloc"
 )
 
-var (
-	pnr = runtime.Pinner{}
-)
+var pnr = runtime.Pinner{}
 
 func NewGDExtensionInstanceBindingCallbacks(
 	createCallback GDExtensionInstanceBindingCreateCallback,

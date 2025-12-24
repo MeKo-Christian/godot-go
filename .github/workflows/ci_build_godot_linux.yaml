@@ -9,7 +9,7 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   TSAN_OPTIONS: suppressions=misc/error_suppressions/tsan.txt
-  CHECKOUT_REF: 'b1371806ad3907c009458ea939bd4b810f9deb21'
+  CHECKOUT_REF: "b1371806ad3907c009458ea939bd4b810f9deb21"
 
 jobs:
   run_build_godot:
@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ env.CHECKOUT_REF }}
-          repository: 'godotengine/godot'
+          repository: "godotengine/godot"
 
       - name: Setup python and scons
         uses: ./.github/actions/godot-deps

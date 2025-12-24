@@ -1,0 +1,54 @@
+version = '2'
+
+[linters]
+default = 'all'
+disable = [
+  'depguard',
+  'exhaustive',
+  'exhaustruct',
+  'godox',
+  'ireturn',
+  'mnd',
+  'musttag',
+  'nlreturn',
+  'wsl',
+]
+
+[linters.settings]
+[linters.settings.varnamelen]
+ignore-names = ['ok', 'id', 'fn', 'cb']
+
+[linters.exclusions]
+generated = 'lax'
+presets = ['comments', 'common-false-positives', 'legacy', 'std-error-handling']
+paths = ['godot_headers$', 'test/concepts$']
+
+[[linters.exclusions.rules]]
+linters = ['gochecknoglobals', 'gochecknoinits']
+path = 'cmd/.*\.go'
+
+[[linters.exclusions.rules]]
+linters = ['err113', 'wrapcheck']
+path = 'cmd/.*\.go'
+
+[[linters.exclusions.rules]]
+linters = ['gochecknoglobals', 'gochecknoinits']
+path = 'pkg/.*/lib\.go'
+
+[[linters.exclusions.rules]]
+linters = ['gochecknoglobals', 'gochecknoinits']
+path = 'test/.*\.go'
+
+[severity]
+default = 'warn'
+
+[[severity.rules]]
+linters = ['exhaustive', 'exhaustruct', 'godox']
+severity = 'info'
+
+[formatters]
+enable = ['gci', 'gofumpt', 'goimports']
+
+[formatters.exclusions]
+generated = 'lax'
+paths = ['godot_headers$', 'test/concepts$']

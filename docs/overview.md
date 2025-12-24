@@ -46,7 +46,7 @@ func (e *Example) V_Ready() { ... }
 ClassDBBindMethodVirtual(t, "V_Ready", "_ready", nil, nil)
 ```
 
-__(NOT YET IMPLEMENTED)__ The eventual best practice will be the following example:
+**(NOT YET IMPLEMENTED)** The eventual best practice will be the following example:
 
 ```go
 func (e *Example) V_Example_Ready() { ... }
@@ -57,9 +57,9 @@ func (e *Example) V_Example_Ready() { ... }
 ClassDBBindMethodVirtual(t, "V_Example_Ready", "_ready", nil, nil)
 ```
 
-* `V_` denotes this this is a virtual function.
-* `Example_` matches the name of the class. godot-go should panic if the registered method does not follow this pattern.
-* `Ready` matches `_ready` gdscript method.
+- `V_` denotes this this is a virtual function.
+- `Example_` matches the name of the class. godot-go should panic if the registered method does not follow this pattern.
+- `Ready` matches `_ready` gdscript method.
 
 ## Default Argument Values
 
@@ -71,7 +71,7 @@ Go does not support static methods in structs. Registering static methods is not
 
 ## Static Variables
 
-Go does not support static variables in structs. __(NOT YET IMPLEMENTED)__ Global variables can be registered as gdscript static variables.
+Go does not support static variables in structs. **(NOT YET IMPLEMENTED)** Global variables can be registered as gdscript static variables.
 
 ## Packed Arrays
 
@@ -79,60 +79,60 @@ Works fine and partially tested in the tests.
 
 ## Coroutines
 
-Go does not support coroutines; this means we do not have acess to `await` (or `yield`). Without a coroutine alternative, a cumbersome pattern of chaining method calls will be required.  __(NOT YET IMPLEMENTED)__ Instead, we have goroutines to wrap `signal` and `callable`.
+Go does not support coroutines; this means we do not have acess to `await` (or `yield`). Without a coroutine alternative, a cumbersome pattern of chaining method calls will be required. **(NOT YET IMPLEMENTED)** Instead, we have goroutines to wrap `signal` and `callable`.
 
 ## Built-in Types
 
 ### Basic Built-in Types
 
-| GDScript Type | Go Type | Description |
-| --- | --- | --- |
-| `null` | `nil` | |
-| `bool` | `bool` | |
-| `int` | `int64` | All method parameters that use variations of `uint` and `int` will be converted to `int64` before passing over the value to Godot. |
-| `float` | `float64` | `float32` will convert to `float64` before passing over the value to Godot. |
-| `String` | `String` | There are helper functions to convert to go native `string`. |
-| `StringName` | `StringName` | There are helper functions to convert to go native `string`. |
-| `NodePath` | `NodePath` | |
+| GDScript Type | Go Type      | Description                                                                                                                        |
+| ------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `null`        | `nil`        |                                                                                                                                    |
+| `bool`        | `bool`       |                                                                                                                                    |
+| `int`         | `int64`      | All method parameters that use variations of `uint` and `int` will be converted to `int64` before passing over the value to Godot. |
+| `float`       | `float64`    | `float32` will convert to `float64` before passing over the value to Godot.                                                        |
+| `String`      | `String`     | There are helper functions to convert to go native `string`.                                                                       |
+| `StringName`  | `StringName` | There are helper functions to convert to go native `string`.                                                                       |
+| `NodePath`    | `NodePath`   |                                                                                                                                    |
 
 ### Vector Built-in Types
 
-| GDScript Type | Go Type |
-| --- | --- |
-| `Vector2` | `Vector2` |
-| `Vector2i` | `Vector2i` |
-| `Rect2` | `Rect2` |
-| `Vector3` | `Vector3` |
-| `Vector3i` | `Vector3i` |
+| GDScript Type | Go Type       |
+| ------------- | ------------- |
+| `Vector2`     | `Vector2`     |
+| `Vector2i`    | `Vector2i`    |
+| `Rect2`       | `Rect2`       |
+| `Vector3`     | `Vector3`     |
+| `Vector3i`    | `Vector3i`    |
 | `Transform2D` | `Transform2D` |
-| `Plane` | `Plane` |
-| `Quaternion` | `Quaternion` |
-| `AABB` | `AABB` |
-| `Basis` | `Basis` |
+| `Plane`       | `Plane`       |
+| `Quaternion`  | `Quaternion`  |
+| `AABB`        | `AABB`        |
+| `Basis`       | `Basis`       |
 | `Transform3D` | `Transform3D` |
 
 ### Engine built-in Types
 
-| GDScript Type | Go Type |
-| --- | --- |
-| `Color` | `Color` |
-| `RID` | `RID` |
-| `Object` | `Object` |
+| GDScript Type | Go Type  |
+| ------------- | -------- |
+| `Color`       | `Color`  |
+| `RID`         | `RID`    |
+| `Object`      | `Object` |
 
 ### Container Built-in Types
 
-| GDScript Type | Go Type | Description |
-| --- | --- | --- |
-| `Array` | `Array` | __(NOT YET IMPLEMENTED)__ `[]Variant`. |
-| `PackedByteArray` | `PackedByteArray` | __(NOT YET IMPLEMENTED)__ `[]byte`. |
-| `PackedInt32Array` | `PackedInt32Array` | __(NOT YET IMPLEMENTED)__ `[]int32`. |
-| `PackedInt64Array` | `PackedInt64Array` | __(NOT YET IMPLEMENTED)__ `[]int64`. |
-| `PackedFloat32Array` | `PackedFloat32Array` | __(NOT YET IMPLEMENTED)__ `[]float32`. |
-| `PackedFloat64Array` | `PackedFloat64Array` | __(NOT YET IMPLEMENTED)__ `[]float64`. |
-| `PackedStringArray` | `PackedStringArray` | __(NOT YET IMPLEMENTED)__ `[]string`. |
-| `PackedVector2Array` | `PackedVector2Array` | __(NOT YET IMPLEMENTED)__ `[]Vector2`. |
-| `PackedVector3Array` | `PackedVector3Array` | __(NOT YET IMPLEMENTED)__ `[]Vector3`. |
-| `PackedColorArray` | `PackedColorArray` | __(NOT YET IMPLEMENTED)__ `[]color`. |
-| `Dictionary` | `Dictionary` | No additional work needed. |
-| `Signal` | `Signal` | No additional work needed. |
-| `Callable` | `Callable` | No additional work needed. |
+| GDScript Type        | Go Type              | Description                            |
+| -------------------- | -------------------- | -------------------------------------- |
+| `Array`              | `Array`              | **(NOT YET IMPLEMENTED)** `[]Variant`. |
+| `PackedByteArray`    | `PackedByteArray`    | **(NOT YET IMPLEMENTED)** `[]byte`.    |
+| `PackedInt32Array`   | `PackedInt32Array`   | **(NOT YET IMPLEMENTED)** `[]int32`.   |
+| `PackedInt64Array`   | `PackedInt64Array`   | **(NOT YET IMPLEMENTED)** `[]int64`.   |
+| `PackedFloat32Array` | `PackedFloat32Array` | **(NOT YET IMPLEMENTED)** `[]float32`. |
+| `PackedFloat64Array` | `PackedFloat64Array` | **(NOT YET IMPLEMENTED)** `[]float64`. |
+| `PackedStringArray`  | `PackedStringArray`  | **(NOT YET IMPLEMENTED)** `[]string`.  |
+| `PackedVector2Array` | `PackedVector2Array` | **(NOT YET IMPLEMENTED)** `[]Vector2`. |
+| `PackedVector3Array` | `PackedVector3Array` | **(NOT YET IMPLEMENTED)** `[]Vector3`. |
+| `PackedColorArray`   | `PackedColorArray`   | **(NOT YET IMPLEMENTED)** `[]color`.   |
+| `Dictionary`         | `Dictionary`         | No additional work needed.             |
+| `Signal`             | `Signal`             | No additional work needed.             |
+| `Callable`           | `Callable`           | No additional work needed.             |

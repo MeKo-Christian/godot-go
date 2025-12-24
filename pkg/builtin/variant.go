@@ -2,6 +2,7 @@ package builtin
 
 // #include <godot/gdextension_interface.h>
 import "C"
+
 import (
 	"fmt"
 	"runtime"
@@ -201,49 +202,47 @@ func (c *Variant) AsGDExtensionTypePtr() GDExtensionTypePtr {
 	return (GDExtensionTypePtr)(c)
 }
 
-var (
-	needsDeinit = [GDEXTENSION_VARIANT_TYPE_VARIANT_MAX]bool{
-		false, //NIL,
-		false, //BOOL,
-		false, //INT,
-		false, //FLOAT,
-		true,  //STRING,
-		false, //VECTOR2,
-		false, //VECTOR2I,
-		false, //RECT2,
-		false, //RECT2I,
-		false, //VECTOR3,
-		false, //VECTOR3I,
-		true,  //TRANSFORM2D,
-		false, //PLANE,
-		false, //QUATERNION,
-		true,  //AABB,
-		true,  //BASIS,
-		true,  //TRANSFORM,
+var needsDeinit = [GDEXTENSION_VARIANT_TYPE_VARIANT_MAX]bool{
+	false, // NIL,
+	false, // BOOL,
+	false, // INT,
+	false, // FLOAT,
+	true,  // STRING,
+	false, // VECTOR2,
+	false, // VECTOR2I,
+	false, // RECT2,
+	false, // RECT2I,
+	false, // VECTOR3,
+	false, // VECTOR3I,
+	true,  // TRANSFORM2D,
+	false, // PLANE,
+	false, // QUATERNION,
+	true,  // AABB,
+	true,  // BASIS,
+	true,  // TRANSFORM,
 
-		// misc types
-		false, //COLOR,
-		true,  //STRING_NAME,
-		true,  //NODE_PATH,
-		false, //RID,
-		true,  //OBJECT,
-		true,  //CALLABLE,
-		true,  //SIGNAL,
-		true,  //DICTIONARY,
-		true,  //ARRAY,
+	// misc types
+	false, // COLOR,
+	true,  // STRING_NAME,
+	true,  // NODE_PATH,
+	false, // RID,
+	true,  // OBJECT,
+	true,  // CALLABLE,
+	true,  // SIGNAL,
+	true,  // DICTIONARY,
+	true,  // ARRAY,
 
-		// typed arrays
-		true, //PACKED_BYTE_ARRAY,
-		true, //PACKED_INT32_ARRAY,
-		true, //PACKED_INT64_ARRAY,
-		true, //PACKED_FLOAT32_ARRAY,
-		true, //PACKED_FLOAT64_ARRAY,
-		true, //PACKED_STRING_ARRAY,
-		true, //PACKED_VECTOR2_ARRAY,
-		true, //PACKED_VECTOR3_ARRAY,
-		true, //PACKED_COLOR_ARRAY,
-	}
-)
+	// typed arrays
+	true, // PACKED_BYTE_ARRAY,
+	true, // PACKED_INT32_ARRAY,
+	true, // PACKED_INT64_ARRAY,
+	true, // PACKED_FLOAT32_ARRAY,
+	true, // PACKED_FLOAT64_ARRAY,
+	true, // PACKED_STRING_ARRAY,
+	true, // PACKED_VECTOR2_ARRAY,
+	true, // PACKED_VECTOR3_ARRAY,
+	true, // PACKED_COLOR_ARRAY,
+}
 
 func (c *Variant) Call(
 	method string,
@@ -279,9 +278,7 @@ func (c *Variant) CallStatic(
 	args []*Variant,
 	r_ret *Variant,
 ) error {
-	var (
-		callArgs *GDExtensionConstVariantPtr
-	)
+	var callArgs *GDExtensionConstVariantPtr
 	sn := NewStringNameWithLatin1Chars(method)
 	defer sn.Destroy()
 	callArgs = (*GDExtensionConstVariantPtr)(unsafe.Pointer(unsafe.SliceData(args)))

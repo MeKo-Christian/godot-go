@@ -6,6 +6,7 @@ package builtin
 #include "wrapped.h"
 */
 import "C"
+
 import (
 	"runtime"
 	"unsafe"
@@ -16,11 +17,13 @@ import (
 	"go.uber.org/zap"
 )
 
-type GodotObject unsafe.Pointer
-type GDExtensionBindingCallback func()
-type GDExtensionClassGoConstructorFromOwner func(*GodotObject) GDExtensionClass
-type GDClassGoConstructorFromOwner func(*GodotObject) GDClass
-type RefCountedConstructor func(reference RefCounted) Ref
+type (
+	GodotObject                            unsafe.Pointer
+	GDExtensionBindingCallback             func()
+	GDExtensionClassGoConstructorFromOwner func(*GodotObject) GDExtensionClass
+	GDClassGoConstructorFromOwner          func(*GodotObject) GDClass
+	RefCountedConstructor                  func(reference RefCounted) Ref
+)
 
 // type GDClassGoConstructor func(data unsafe.Pointer) GDExtensionObjectPtr
 

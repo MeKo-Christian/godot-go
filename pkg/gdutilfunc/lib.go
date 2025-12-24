@@ -5,6 +5,7 @@ package gdutilfunc
 #include <godot/gdextension_interface.h>
 */
 import "C"
+
 import (
 	"runtime"
 	"unsafe"

@@ -3,6 +3,7 @@
 ## Setup the Launcher
 
 To debug with `gdb` with `vscode`, it's important to setup the proper `pathSubstitutions` mappings for breakpoints to work. Here's an example `launch.json`:
+
 ```
 {
     "version": "0.2.0",

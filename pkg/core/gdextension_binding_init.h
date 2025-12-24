@@ -4,10 +4,14 @@
 #include <godot/gdextension_interface.h>
 
 // TODO: do we need this here?
-void GDExtensionBindingInitializeLevel(void *userdata, GDExtensionInitializationLevel p_level);
-void GDExtensionBindingDeinitializeLevel(void *userdata, GDExtensionInitializationLevel p_level);
+void GDExtensionBindingInitializeLevel(void *userdata,
+                                       GDExtensionInitializationLevel p_level);
+void GDExtensionBindingDeinitializeLevel(
+    void *userdata, GDExtensionInitializationLevel p_level);
 
-void cgo_callfn_GDExtensionBindingInitializeLevel(void *userdata, GDExtensionInitializationLevel p_level);
-void cgo_callfn_GDExtensionBindingDeinitializeLevel(void *userdata, GDExtensionInitializationLevel p_level);
+void cgo_callfn_GDExtensionBindingInitializeLevel(
+    void *userdata, GDExtensionInitializationLevel p_level);
+void cgo_callfn_GDExtensionBindingDeinitializeLevel(
+    void *userdata, GDExtensionInitializationLevel p_level);
 
 #endif

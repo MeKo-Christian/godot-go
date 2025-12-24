@@ -14,9 +14,7 @@ import (
 	_ "github.com/godot-go/godot-go/pkg/log"
 )
 
-var (
-	pnr runtime.Pinner
-)
+var pnr runtime.Pinner
 
 //export TestDemoInit
 func TestDemoInit(p_get_proc_address unsafe.Pointer, p_library unsafe.Pointer, r_initialization unsafe.Pointer) bool {

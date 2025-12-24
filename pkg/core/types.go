@@ -102,6 +102,4 @@ func NewClassInfo(
 	return ret
 }
 
-var (
-	classdbCurrentLevel GDExtensionInitializationLevel = GDEXTENSION_INITIALIZATION_CORE
-)
+var classdbCurrentLevel GDExtensionInitializationLevel = GDEXTENSION_INITIALIZATION_CORE

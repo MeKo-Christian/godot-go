@@ -5,6 +5,7 @@ package main
 #include <string.h>
 */
 import "C"
+
 import (
 	"fmt"
 	"runtime"

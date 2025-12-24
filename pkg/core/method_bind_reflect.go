@@ -5,6 +5,7 @@ package core
 // #include <stdio.h>
 // #include <stdlib.h>
 import "C"
+
 import (
 	"fmt"
 	"reflect"
@@ -178,7 +179,6 @@ func convertVariantToGoTypeReflectValue(arg Variant, t reflect.Type) (reflect.Va
 			}
 			if obj == nil {
 				return reflect.Zero(t), nil
-
 			}
 			ref := constructor(obj.(RefCounted))
 			return reflect.ValueOf(ref), nil

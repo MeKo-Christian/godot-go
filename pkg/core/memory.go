@@ -6,14 +6,14 @@ package core
 #include <string.h>
 */
 import "C"
+
 import (
 	"reflect"
 	"unsafe"
 
+	"github.com/CannibalVox/cgoalloc"
 	. "github.com/godot-go/godot-go/pkg/builtin"
 	. "github.com/godot-go/godot-go/pkg/ffi"
-
-	"github.com/CannibalVox/cgoalloc"
 	"github.com/godot-go/godot-go/pkg/log"
 	"go.uber.org/zap"
 )

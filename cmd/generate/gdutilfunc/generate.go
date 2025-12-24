@@ -2,27 +2,22 @@ package gdutilfunc
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
 
-	_ "embed"
-
 	"github.com/godot-go/godot-go/cmd/extensionapiparser"
 	"github.com/iancoleman/strcase"
 )
 
-var (
-	//go:embed utilityfunctions.go.tmpl
-	utilityFunctionsText string
-)
+//go:embed utilityfunctions.go.tmpl
+var utilityFunctionsText string
 
 // Generate will generate Go wrappers for all Godot base types
 func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var (
-		err error
-	)
+	var err error
 	if err = GenerateUtilityFunctions(projectPath, eapi); err != nil {
 		panic(err)
 	}
@@ -40,7 +35,6 @@ func GenerateUtilityFunctions(projectPath string, extensionApi extensionapiparse
 			"goEncodeIsReference": goEncodeIsReference,
 		}).
 		Parse(utilityFunctionsText)
-
 	if err != nil {
 		return err
 	}
@@ -48,7 +42,6 @@ func GenerateUtilityFunctions(projectPath string, extensionApi extensionapiparse
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -56,7 +49,6 @@ func GenerateUtilityFunctions(projectPath string, extensionApi extensionapiparse
 	filename := filepath.Join(projectPath, "pkg", "gdutilfunc", fmt.Sprintf("utilityfunctions.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -64,7 +56,6 @@ func GenerateUtilityFunctions(projectPath string, extensionApi extensionapiparse
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}

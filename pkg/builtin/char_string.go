@@ -4,12 +4,12 @@ package builtin
 // #include <stdio.h>
 // #include <stdlib.h>
 import "C"
+
 import (
 	"fmt"
 	"unsafe"
 
 	. "github.com/godot-go/godot-go/pkg/ffi"
-
 	"github.com/godot-go/godot-go/pkg/log"
 	"go.uber.org/zap"
 	"golang.org/x/text/encoding/unicode/utf32"
@@ -147,9 +147,7 @@ func (cx String) ToUtf8() string {
 	return ret
 }
 
-var (
-	utf32encoding = utf32.UTF32(utf32.LittleEndian, utf32.IgnoreBOM)
-)
+var utf32encoding = utf32.UTF32(utf32.LittleEndian, utf32.IgnoreBOM)
 
 func (cx String) ToUtf32() string {
 	ptr := (GDExtensionConstStringPtr)(cx.NativeConstPtr())

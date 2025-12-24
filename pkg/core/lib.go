@@ -7,6 +7,7 @@ package core
 #include "method_bind.h"
 */
 import "C"
+
 import (
 	"fmt"
 	"reflect"

@@ -8,6 +8,7 @@ package ffi
 #include <string.h>
 */
 import "C"
+
 import (
 	"unsafe"
 )

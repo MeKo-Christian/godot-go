@@ -1,9 +1,8 @@
 package preprocessor
 
 import (
-	"testing"
-
 	_ "embed"
+	"testing"
 
 	"github.com/stretchr/testify/require"
 )

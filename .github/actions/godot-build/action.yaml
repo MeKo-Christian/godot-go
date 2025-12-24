@@ -22,16 +22,16 @@ inputs:
     default: 7168
   path:
     description: The path of the godot source code
-    default: '.'
+    default: "."
 runs:
   using: "composite"
   steps:
     - name: Scons Build
       shell: bash
       env:
-          SCONSFLAGS: ${{ inputs.sconsflags }}
-          SCONS_CACHE: ${{ inputs.scons-cache }}
-          SCONS_CACHE_LIMIT: ${{ inputs.scons-cache-limit }}
+        SCONSFLAGS: ${{ inputs.sconsflags }}
+        SCONS_CACHE: ${{ inputs.scons-cache }}
+        SCONS_CACHE_LIMIT: ${{ inputs.scons-cache-limit }}
       run: |
         pushd ${{ inputs.path }}
         echo "Building with flags:" platform=${{ inputs.platform }} target=${{ inputs.target }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}

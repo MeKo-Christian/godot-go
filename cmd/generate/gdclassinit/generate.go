@@ -2,12 +2,11 @@ package gdclassinit
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
-
-	_ "embed"
 
 	"github.com/godot-go/godot-go/cmd/extensionapiparser"
 )
@@ -25,9 +24,7 @@ var (
 
 // Generate will generate Go wrappers for all Godot base types
 func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var (
-		err error
-	)
+	var err error
 	if err = GenerateCHeaderClassCallbacks(projectPath, eapi); err != nil {
 		panic(err)
 	}
@@ -53,7 +50,6 @@ func GenerateClassInit(projectPath string, extensionApi extensionapiparser.Exten
 			"coalesce":             coalesce,
 		}).
 		Parse(classesInitText)
-
 	if err != nil {
 		return err
 	}
@@ -61,7 +57,6 @@ func GenerateClassInit(projectPath string, extensionApi extensionapiparser.Exten
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -69,7 +64,6 @@ func GenerateClassInit(projectPath string, extensionApi extensionapiparser.Exten
 	filename := filepath.Join(projectPath, "pkg", "gdclassinit", fmt.Sprintf("classes.init.gen.go"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -77,7 +71,6 @@ func GenerateClassInit(projectPath string, extensionApi extensionapiparser.Exten
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -96,7 +89,6 @@ func GenerateCHeaderClassCallbacks(projectPath string, extensionApi extensionapi
 			"coalesce":        coalesce,
 		}).
 		Parse(cHeaderClassesText)
-
 	if err != nil {
 		return err
 	}
@@ -104,7 +96,6 @@ func GenerateCHeaderClassCallbacks(projectPath string, extensionApi extensionapi
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -112,7 +103,6 @@ func GenerateCHeaderClassCallbacks(projectPath string, extensionApi extensionapi
 	filename := filepath.Join(projectPath, "pkg", "gdclassinit", fmt.Sprintf("classes.callbacks.gen.h"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -120,7 +110,6 @@ func GenerateCHeaderClassCallbacks(projectPath string, extensionApi extensionapi
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}
@@ -139,7 +128,6 @@ func GenerateCClassCallbacks(projectPath string, extensionApi extensionapiparser
 			"coalesce":        coalesce,
 		}).
 		Parse(cClassesText)
-
 	if err != nil {
 		return err
 	}
@@ -147,7 +135,6 @@ func GenerateCClassCallbacks(projectPath string, extensionApi extensionapiparser
 	var b bytes.Buffer
 
 	err = tmpl.Execute(&b, extensionApi)
-
 	if err != nil {
 		return err
 	}
@@ -155,7 +142,6 @@ func GenerateCClassCallbacks(projectPath string, extensionApi extensionapiparser
 	filename := filepath.Join(projectPath, "pkg", "gdclassinit", fmt.Sprintf("classes.callbacks.gen.c"))
 
 	f, err := os.Create(filename)
-
 	if err != nil {
 		return err
 	}
@@ -163,7 +149,6 @@ func GenerateCClassCallbacks(projectPath string, extensionApi extensionapiparser
 	defer f.Close()
 
 	_, err = f.Write(b.Bytes())
-
 	if err != nil {
 		return err
 	}

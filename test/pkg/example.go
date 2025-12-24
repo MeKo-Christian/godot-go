@@ -69,7 +69,8 @@ func (e *Example) SimpleConstFunc(a int64) {
 // }
 
 func (e *Example) ReturnSomething(base string, f32 float32, f64 float64,
-	i int, i8 int8, i16 int16, i32 int32, i64 int64) string {
+	i int, i8 int8, i16 int16, i32 int32, i64 int64,
+) string {
 	println("  Return something called (8 values cancatenated as a string).")
 	return fmt.Sprintf("1. %s, 2. %f, 3. %f, 4. %d, 5. %d, 6. %d, 7. %d, 8. %d", base+"42", f32, f64, i, i8, i16, i32, i64)
 }
@@ -613,7 +614,8 @@ func RegisterClassExample() {
 		ClassDBAddSignal(t, "custom_signal",
 			SignalParam{
 				Type: GDEXTENSION_VARIANT_TYPE_STRING,
-				Name: "name"},
+				Name: "name",
+			},
 			SignalParam{
 				Type: GDEXTENSION_VARIANT_TYPE_INT,
 				Name: "value",

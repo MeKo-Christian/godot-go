@@ -15,8 +15,7 @@ type RegularStruct struct {
 	opaque [8]uint8
 }
 
-type TestEncoder[I any, T BaseStruct[I]] struct {
-}
+type TestEncoder[I any, T BaseStruct[I]] struct{}
 
 func TestGenericStruct() {
 	a := GenericStruct{}

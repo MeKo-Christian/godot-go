@@ -10,9 +10,7 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-var (
-	goReturnType = goArgumentType
-)
+var goReturnType = goArgumentType
 
 func goFormatFieldName(n string) string {
 	n = goArgumentName(n)
@@ -271,9 +269,7 @@ func goHasArgumentTypeEncoder(t string) bool {
 		t = t[8:]
 	}
 
-	var (
-		indirection int
-	)
+	var indirection int
 
 	if strings.HasSuffix(t, "**") {
 		indirection = 2

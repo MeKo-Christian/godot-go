@@ -25,9 +25,7 @@ func (o ObjectID) IsNull() bool {
 	return uint64(o.Id) == uint64(0)
 }
 
-var (
-	lastObjectIDValue uint64
-)
+var lastObjectIDValue uint64
 
 func NewObjectID() ObjectID {
 	v := atomic.AddUint64(&lastObjectIDValue, 1)

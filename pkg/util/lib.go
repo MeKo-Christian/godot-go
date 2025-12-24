@@ -6,10 +6,9 @@ package util
 #include <godot/gdextension_interface.h>
 */
 import "C"
+
 import (
 	"unsafe"
 )
 
-var (
-	nullptr = unsafe.Pointer(nil)
-)
+var nullptr = unsafe.Pointer(nil)

@@ -5,6 +5,7 @@ package gdclassinit
 #include <godot/gdextension_interface.h>
 */
 import "C"
+
 import (
 	"runtime"
 	"unsafe"

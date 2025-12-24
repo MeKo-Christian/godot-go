@@ -3,6 +3,7 @@ package builtin
 // #include <godot/gdextension_interface.h>
 // #include "wrapped.h"
 import "C"
+
 import (
 	"fmt"
 	"runtime/cgo"
@@ -13,8 +14,10 @@ import (
 	"go.uber.org/zap"
 )
 
-type GetPropertyFunc func(string, *Variant)
-type SetPropertyFunc func(string, *Variant)
+type (
+	GetPropertyFunc func(string, *Variant)
+	SetPropertyFunc func(string, *Variant)
+)
 
 type GDClass interface {
 	Wrapped

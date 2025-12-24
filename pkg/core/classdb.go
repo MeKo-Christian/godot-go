@@ -6,6 +6,7 @@ package core
 // #include <stdio.h>
 // #include <stdlib.h>
 import "C"
+
 import (
 	"fmt"
 	"reflect"

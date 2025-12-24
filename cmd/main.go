@@ -18,7 +18,6 @@ import (
 	"github.com/godot-go/godot-go/cmd/generate/gdclassinit"
 	"github.com/godot-go/godot-go/cmd/generate/gdutilfunc"
 	"github.com/godot-go/godot-go/cmd/generate/nativestructure"
-
 	"github.com/spf13/cobra"
 )
 
@@ -38,9 +37,7 @@ var (
 
 func init() {
 	absPath, _ := filepath.Abs(".")
-	var (
-		defaultBuildConfig string
-	)
+	var defaultBuildConfig string
 	if strings.Contains(runtime.GOARCH, "32") {
 		defaultBuildConfig = "float_32"
 	} else {
