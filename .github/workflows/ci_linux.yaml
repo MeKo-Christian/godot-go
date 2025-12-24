@@ -45,6 +45,9 @@ jobs:
 
       - run: go version
 
+      - name: Install just
+        uses: extractions/setup-just@v2
+
       - run: mkdir -p bin/
 
       - name: Install Godot 4.5 stable
@@ -68,14 +71,14 @@ jobs:
 
       - name: Update Godot Headers
         run: |
-          make update_godot_headers_from_binary
+          just update_godot_headers_from_binary
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
 
       - name: Code Generation
         run: |
-          PATH=$PATH:$(go env GOPATH)/bin make generate
+          PATH=$PATH:$(go env GOPATH)/bin just generate
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
@@ -83,7 +86,7 @@ jobs:
       - run: git diff
 
       - name: Build
-        run: make build
+        run: just build
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
@@ -96,7 +99,7 @@ jobs:
         if: ${{ matrix.os == 'linux' }}
         timeout-minutes: 3
         run: |
-          make ci_gen_test_project_files
+          just ci_gen_test_project_files
         continue-on-error: true
         env:
           CI: 1
@@ -107,7 +110,7 @@ jobs:
         if: ${{ matrix.os == 'linux' }}
         timeout-minutes: 2
         run: |
-          make test
+          just test
         env:
           CI: 1
           LOG_LEVEL: "debug"

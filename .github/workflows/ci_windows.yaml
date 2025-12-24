@@ -38,6 +38,10 @@ jobs:
         with:
           go-version: '1.25.0'
       - run: go version
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
       - name: Set up scoop
         uses: MinoruSekine/setup-scoop@main
         with:
@@ -68,16 +72,16 @@ jobs:
 
       - name: Update Godot Headers
         run: |
-          make update_godot_headers_from_binary
+          just update_godot_headers_from_binary
 
       - name: Code Generation
         run: |
-          PATH=$PATH:$(go env GOPATH)/bin make generate
+          PATH=$PATH:$(go env GOPATH)/bin just generate
         shell: bash
 
       - name: Build
         run: |
-          make build
+          just build
         shell: bash
 
       - name: List Artifacts Directory
@@ -88,7 +92,7 @@ jobs:
 
       - name: Gen Test Project Files
         timeout-minutes: 3
-        run: make ci_gen_test_project_files
+        run: just ci_gen_test_project_files
         continue-on-error: true
         env:
           CI: 1
@@ -97,7 +101,7 @@ jobs:
 
       - name: Test
         timeout-minutes: 7
-        run: make test
+        run: just test
         continue-on-error: true
         shell: bash
         env:

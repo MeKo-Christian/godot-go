@@ -1,0 +1,67 @@
+# run with treefmt --allow-missing-formatter
+
+[global]
+excludes = [
+  # godot headers (external)
+  "godot_headers/**",
+  # generated files
+  "**/*.gen.go",
+  "**/*.gen.c",
+  "**/*.gen.h",
+  # go.sum & go.mod
+  "go.sum",
+  "go.mod",
+  # gitignore
+  "**/.gitignore",
+  # godot project files
+  "test/demo/.godot/**",
+  "**/*.tscn",
+  "**/*.tres",
+  "**/*.import",
+]
+
+### Misc
+
+[formatter.prettier]
+command = "prettier"
+options = ["-w"]
+includes = [
+  "*.yaml",
+  "*.yml",
+  "*.json",
+  "*.md",
+]
+
+### Go
+
+[formatter.gofumpt]
+command = "gofumpt"
+options = ["-w"]
+includes = ["*.go"]
+
+[formatter.gci]
+command = "gci"
+options = ["-w"]
+includes = ["*.go"]
+priority = 1 # run after gofumpt
+
+### C
+
+[formatter.clang-format]
+command = "clang-format"
+options = ["-i"]
+includes = ["*.c", "*.h"]
+
+### Shell
+
+[formatter.shfmt]
+command = "shfmt"
+options = ["-s", "-w"]
+includes = ["*.sh"]
+
+### Just
+
+[formatter.just]
+command = "just"
+options = ["--fmt", "--unstable", "-f"]
+includes = ["justfile"]
