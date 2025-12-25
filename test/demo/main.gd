@@ -8,6 +8,10 @@ class TestClass:
 
 func _ready():
 	var example: Example = $Example
+	if OS.has_environment("GODOT_GO_LEAK_TEST"):
+		await run_leak_test(example)
+		exit_with_status()
+		return
 	test_suite(1, example)
 	# example.group_subgroup_custom_position = Vector2(0, 0)
 	# custom_signal_emitted = null
@@ -16,6 +20,36 @@ func _ready():
 	# 	await t.create_timer(3.0).timeout
 	# test_suite(2, example)
 	exit_with_status()
+
+func run_leak_test(example: Example) -> void:
+	var duration_seconds := get_env_int("GODOT_GO_LEAK_TEST_SECONDS", 600)
+	var interval_ms := get_env_int("GODOT_GO_LEAK_TEST_INTERVAL_MS", 100)
+	var iterations := get_env_int("GODOT_GO_LEAK_TEST_ITERATIONS", 1000)
+	var max_heap_bytes := get_env_int("GODOT_GO_LEAK_TEST_MAX_HEAP_BYTES", 10 * 1024 * 1024)
+	var max_heap_objects := get_env_int("GODOT_GO_LEAK_TEST_MAX_HEAP_OBJECTS", 5000)
+
+	print("leak test: duration=%ss interval_ms=%s iterations=%s max_heap_bytes=%s max_heap_objects=%s" % [
+		duration_seconds, interval_ms, iterations, max_heap_bytes, max_heap_objects
+	])
+
+	example.leak_check_start()
+
+	var end_time := Time.get_ticks_msec() + duration_seconds * 1000
+	while Time.get_ticks_msec() < end_time:
+		example.leak_check_tick(iterations)
+		await get_tree().create_timer(float(interval_ms) / 1000.0).timeout
+
+	var results := example.leak_check_finish(max_heap_bytes, max_heap_objects)
+	var ok := results.get("ok", false)
+	print("leak test results: ", results)
+	assert_true(ok)
+
+func get_env_int(name: String, default_value: int) -> int:
+	if OS.has_environment(name):
+		var raw := OS.get_environment(name)
+		if raw != "":
+			return int(raw)
+	return default_value
 
 func test_suite(i: int, example: Example):
 	print("test suite run %d" % [i])

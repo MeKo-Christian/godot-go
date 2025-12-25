@@ -45,6 +45,41 @@ builtin.WithStringName("Node", func(nodeName builtin.StringName) {
 })
 ```
 
+## Finalizers (Not Used)
+
+godot-go does not use `runtime.SetFinalizer` for `String`, `StringName`, or
+other builtins. Finalizers are a poor fit here for a few reasons:
+
+- Builtin types are small value types that get copied freely; a finalizer would
+  run on a pointer to one copy and can double-free or free the wrong owner.
+- Finalizers run on the GC thread at unpredictable times; calling into Godot
+  from a finalizer is unsafe because the API is not thread-safe and the engine
+  may already be shutting down.
+- Cgo finalizers can race with in-flight pinned data and lifetime assumptions,
+  which makes failures hard to debug and nondeterministic.
+
+Instead, explicit `Destroy()` calls and scoped helpers are the supported
+approach. Leak detection is tracked via long-running tests (see Task 1.7).
+
+## Leak Test
+
+The demo project includes a leak test that runs the game loop for a fixed
+duration and checks Go heap growth via `runtime.MemStats`.
+
+Run it with:
+
+```bash
+just leak_test
+```
+
+Environment overrides:
+
+- `GODOT_GO_LEAK_TEST_SECONDS` (default: 600)
+- `GODOT_GO_LEAK_TEST_INTERVAL_MS` (default: 100)
+- `GODOT_GO_LEAK_TEST_ITERATIONS` (default: 1000)
+- `GODOT_GO_LEAK_TEST_MAX_HEAP_BYTES` (default: 10485760)
+- `GODOT_GO_LEAK_TEST_MAX_HEAP_OBJECTS` (default: 5000)
+
 ## Notes
 
 - If you create a type listed above, you own it and must call `Destroy()`.

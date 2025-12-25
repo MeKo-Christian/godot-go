@@ -183,6 +183,20 @@ test:
     GODEBUG=gctrace=1,asyncpreemptoff=1,cgocheck=1,invalidptr=1,clobberfree=1 \
     "{{ GODOT }}" --headless --verbose --path test/demo/ --quit
 
+# Run leak test in headless mode (configurable via env vars)
+leak_test:
+    CI=1 \
+    LOG_LEVEL=info \
+    GOTRACEBACK=single \
+    GODEBUG=gctrace=1,asyncpreemptoff=1,cgocheck=1,invalidptr=1,clobberfree=1 \
+    GODOT_GO_LEAK_TEST=1 \
+    GODOT_GO_LEAK_TEST_SECONDS=600 \
+    GODOT_GO_LEAK_TEST_INTERVAL_MS=100 \
+    GODOT_GO_LEAK_TEST_ITERATIONS=1000 \
+    GODOT_GO_LEAK_TEST_MAX_HEAP_BYTES=10485760 \
+    GODOT_GO_LEAK_TEST_MAX_HEAP_OBJECTS=5000 \
+    "{{ GODOT }}" --headless --verbose --path test/demo/ --quit
+
 # Run interactive test with debug output
 interactive_test:
     LOG_LEVEL=info \

@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"fmt"
+	"runtime"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
@@ -41,6 +43,7 @@ type Example struct {
 	customPosition   Vector2
 	propertyFromList Vector3
 	dprop            [3]Vector2
+	leakStart        runtime.MemStats
 }
 
 func (c *Example) GetClassName() string {
@@ -286,6 +289,74 @@ func (e *Example) VarargsFuncVoid(args ...Variant) {
 
 func (e *Example) VarargsFuncNv(args ...Variant) int {
 	return 42 + len(args)
+}
+
+func (e *Example) LeakCheckStart() {
+	runtime.GC()
+	debug.FreeOSMemory()
+	runtime.ReadMemStats(&e.leakStart)
+}
+
+func (e *Example) LeakCheckTick(iterations int64) {
+	for i := int64(0); i < iterations; i++ {
+		s := NewStringWithUtf8Chars("leak_test")
+		s.Destroy()
+
+		sn := NewStringNameWithUtf8Chars("leak_test")
+		sn.Destroy()
+
+		v := NewVariantInt64(i)
+		v.Destroy()
+
+		arr := NewArray()
+		arrVal := NewVariantInt64(i)
+		arr.Insert(0, arrVal)
+		arrVal.Destroy()
+		arr.Destroy()
+
+		dict := NewDictionary()
+		dictVal := NewVariantInt64(i)
+		dict.SetKeyed("value", dictVal)
+		dictVal.Destroy()
+		dict.Destroy()
+	}
+}
+
+func (e *Example) LeakCheckFinish(maxHeapBytes int64, maxHeapObjects int64) Dictionary {
+	runtime.GC()
+	debug.FreeOSMemory()
+
+	var end runtime.MemStats
+	runtime.ReadMemStats(&end)
+
+	deltaHeapBytes := int64(end.HeapAlloc) - int64(e.leakStart.HeapAlloc)
+	deltaHeapObjects := int64(end.HeapObjects) - int64(e.leakStart.HeapObjects)
+
+	okBytes := maxHeapBytes <= 0 || deltaHeapBytes <= maxHeapBytes
+	okObjects := maxHeapObjects <= 0 || deltaHeapObjects <= maxHeapObjects
+	ok := okBytes && okObjects
+
+	result := NewDictionary()
+	heapBytes := NewVariantInt64(deltaHeapBytes)
+	result.SetKeyed("heap_bytes", heapBytes)
+	heapBytes.Destroy()
+
+	heapObjects := NewVariantInt64(deltaHeapObjects)
+	result.SetKeyed("heap_objects", heapObjects)
+	heapObjects.Destroy()
+
+	maxBytes := NewVariantInt64(maxHeapBytes)
+	result.SetKeyed("max_heap_bytes", maxBytes)
+	maxBytes.Destroy()
+
+	maxObjects := NewVariantInt64(maxHeapObjects)
+	result.SetKeyed("max_heap_objects", maxObjects)
+	maxObjects.Destroy()
+
+	okVar := NewVariantBool(ok)
+	result.SetKeyed("ok", okVar)
+	okVar.Destroy()
+	return result
 }
 
 func (e *Example) V_PropertyCanRevert(p_name StringName) bool {
@@ -586,6 +657,9 @@ func RegisterClassExample() {
 		ClassDBBindMethod(t, "TestStrUtility", "test_str_utility", nil, nil)
 		ClassDBBindMethod(t, "TestVectorOps", "test_vector_ops", nil, nil)
 		ClassDBBindMethod(t, "TestInstanceFromIdUtility", "test_instance_from_id_utility", nil, nil)
+		ClassDBBindMethod(t, "LeakCheckStart", "leak_check_start", nil, nil)
+		ClassDBBindMethod(t, "LeakCheckTick", "leak_check_tick", []string{"iterations"}, nil)
+		ClassDBBindMethod(t, "LeakCheckFinish", "leak_check_finish", []string{"max_heap_bytes", "max_heap_objects"}, nil)
 
 		// varargs
 		ClassDBBindMethodVarargs(t, "VarargsFunc", "varargs_func", nil, nil)

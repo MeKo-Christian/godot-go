@@ -124,3 +124,75 @@ jobs:
           CI: 1
           LOG_LEVEL: "debug"
           LANG: "en_US.utf8"
+
+  leak_test:
+    name: "leak test"
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    env:
+      GODOT: /usr/local/bin/godot
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add Go 1.25 To System Path
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.0"
+
+      - run: go version
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - run: mkdir -p bin/
+
+      - name: Install Godot 4.5 stable
+        run: |
+          wget https://github.com/godotengine/godot-builds/releases/download/4.5-stable/Godot_v4.5-stable_linux.x86_64.zip
+          sudo unzip Godot_v4.5-stable_linux.x86_64.zip -d /usr/local/bin
+          sudo ln -s Godot_v4.5-stable_linux.x86_64 /usr/local/bin/godot
+
+      - name: Setup Godot binary
+        run: |
+          sudo chmod +x /usr/local/bin/godot
+          ls -alh /usr/local/bin/
+
+      - name: Update Godot Headers
+        run: |
+          just update_godot_headers_from_binary
+        env:
+          GOOS: linux
+          GOARCH: amd64
+
+      - name: Code Generation
+        run: |
+          PATH=$PATH:$(go env GOPATH)/bin just generate
+        env:
+          GOOS: linux
+          GOARCH: amd64
+
+      - name: Build
+        run: just build
+        env:
+          GOOS: linux
+          GOARCH: amd64
+
+      - name: Gen Test Project Files
+        timeout-minutes: 3
+        run: |
+          just ci_gen_test_project_files
+        continue-on-error: true
+        env:
+          CI: 1
+          LOG_LEVEL: "debug"
+          LANG: "en_US.utf8"
+
+      - name: Leak Test
+        timeout-minutes: 15
+        run: |
+          just leak_test
+        env:
+          CI: 1
+          LOG_LEVEL: "debug"
+          LANG: "en_US.utf8"
