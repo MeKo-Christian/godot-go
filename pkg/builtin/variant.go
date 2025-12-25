@@ -131,8 +131,8 @@ func getObjectInstanceBinding(engineObject *GodotObject) Object {
 		)
 	}
 	pnr.Pin(snClassNamePtr)
-	// defer snClassName.Destroy()
 	className := snClassName.ToUtf8()
+	snClassName.Destroy()
 	// const GDExtensionInstanceBindingCallbacks *binding_callbacks = nullptr;
 	// Otherwise, try to look up the correct binding callbacks.
 	cbs, ok := GDExtensionBindingGDExtensionInstanceBindingCallbacks.Get(className)
@@ -451,21 +451,21 @@ func ZapVariant(key string, v Variant) zap.Field {
 
 func ZapVector2(key string, v Vector2) zap.Field {
 	variant := NewVariantVector2(v)
-	// defer variant.Destroy()
+	defer variant.Destroy()
 	value := variant.Stringify()
 	return zap.String(key, value)
 }
 
 func ZapVector3(key string, v Vector3) zap.Field {
 	variant := NewVariantVector3(v)
-	// defer variant.Destroy()
+	defer variant.Destroy()
 	value := variant.Stringify()
 	return zap.String(key, value)
 }
 
 func ZapVector4(key string, v Vector4) zap.Field {
 	variant := NewVariantVector4(v)
-	// defer variant.Destroy()
+	defer variant.Destroy()
 	value := variant.Stringify()
 	return zap.String(key, value)
 }

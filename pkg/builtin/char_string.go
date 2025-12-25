@@ -62,7 +62,7 @@ func NewStringNameWithUtf8Chars(content string) StringName {
 
 func (cx StringName) AsString() String {
 	buf := cx.ToUtf8Buffer()
-	// defer buf.Destroy()
+	defer buf.Destroy()
 	return buf.GetStringFromUtf8()
 }
 

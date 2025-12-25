@@ -194,7 +194,8 @@ func ClassDBAddSignal(t GDClass, signalName string, params ...SignalParam) {
 			hintString.AsGDExtensionConstStringPtr(),
 			(uint32)(PROPERTY_USAGE_DEFAULT),
 		)
-		// defer paramArr[i].Destroy()
+		// Note: PropertyInfo.Destroy() must NOT be called here - the StringName/String
+		// objects above own the memory and their defers handle cleanup.
 	}
 	var pi *GDExtensionPropertyInfo
 	if len(paramArr) > 0 {
