@@ -9,4 +9,7 @@ Start here:
 - Signals: `docs/signals.md`
 - Physics: `docs/physics.md`
 - Input: `docs/input.md`
+- Audio: `docs/audio.md`
+- Visual effects: `docs/visual_effects.md`
+- Camera & viewport: `docs/camera.md`
 - Common API reference: `docs/api_reference.md`

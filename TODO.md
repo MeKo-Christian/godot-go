@@ -163,21 +163,21 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** Medium — enhances game feel
 
-- [ ] **Task 4.1: Audio**
-  - [ ] Test AudioStreamPlayer2D with godot-go
-  - [ ] Verify audio loading from resources
-  - [ ] Create audio playback example
-  - [ ] Document spatial audio setup
+- [x] **Task 4.1: Audio**
+  - [x] Test AudioStreamPlayer2D with godot-go
+  - [x] Verify audio loading from resources
+  - [x] Create audio playback example
+  - [x] Document spatial audio setup
 
-- [ ] **Task 4.2: Visual effects**
-  - [ ] Test GPUParticles2D for ball impacts
-  - [ ] Verify AnimatedSprite2D frame control
-  - [ ] Test shader material application
-  - [ ] Document canvas drawing (if needed)
+- [x] **Task 4.2: Visual effects**
+  - [x] Test GPUParticles2D for ball impacts
+  - [x] Verify AnimatedSprite2D frame control
+  - [x] Test shader material application
+  - [x] Document canvas drawing (if needed)
 
-- [ ] **Task 4.3: Camera & Viewport**
-  - [ ] Test Camera2D following
-  - [ ] Verify viewport scaling/resolution handling
+- [x] **Task 4.3: Camera & Viewport**
+  - [x] Test Camera2D following
+  - [x] Verify viewport scaling/resolution handling
 
 ---
 

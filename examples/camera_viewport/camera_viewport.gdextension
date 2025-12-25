@@ -1,0 +1,17 @@
+[configuration]
+
+entry_symbol = "CameraViewportInit"
+compatibility_minimum = 4.5
+
+[libraries]
+
+macos.debug.x86_64 = "res://lib/libgodotgo-camera-viewport-macos-amd64.framework"
+macos.release.x86_64 = "res://lib/libgodotgo-camera-viewport-macos-amd64.framework"
+macos.debug.arm64 = "res://lib/libgodotgo-camera-viewport-macos-arm64.framework"
+macos.release.arm64 = "res://lib/libgodotgo-camera-viewport-macos-arm64.framework"
+windows.debug.x86_64 = "res://lib/libgodotgo-camera-viewport-windows-amd64.dll"
+windows.release.x86_64 = "res://lib/libgodotgo-camera-viewport-windows-amd64.dll"
+linux.debug.x86_64 = "res://lib/libgodotgo-camera-viewport-linux-amd64.so"
+linux.release.x86_64 = "res://lib/libgodotgo-camera-viewport-linux-amd64.so"
+linux.debug.arm64 = "res://lib/libgodotgo-camera-viewport-linux-arm64.so"
+linux.release.arm64 = "res://lib/libgodotgo-camera-viewport-linux-arm64.so"

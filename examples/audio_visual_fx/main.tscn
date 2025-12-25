@@ -1,0 +1,23 @@
+[gd_scene load_steps=1 format=3]
+
+[node name="Main" type="AudioVisualDemo"]
+
+[node name="SFXPlayer" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(320, 120)
+
+[node name="ImpactParticles" type="GPUParticles2D" parent="."]
+position = Vector2(520, 140)
+amount = 64
+lifetime = 0.9
+emitting = false
+
+[node name="GlowSprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(120, 140)
+
+[node name="ShaderPanel" type="ColorRect" parent="."]
+position = Vector2(40, 240)
+size = Vector2(560, 120)
+
+[node name="Instructions" type="Label" parent="."]
+text = "Audio/Visual FX demo: a beep pans left-right, particles emit, and shader + sprite animate."
+position = Vector2(24, 24)

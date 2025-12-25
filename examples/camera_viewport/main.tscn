@@ -1,0 +1,15 @@
+[gd_scene load_steps=1 format=3]
+
+[node name="Main" type="CameraViewportDemo"]
+
+[node name="Target" type="Node2D" parent="."]
+position = Vector2(320, 180)
+
+[node name="TargetSprite" type="Sprite2D" parent="Target"]
+
+[node name="Camera2D" type="Camera2D" parent="Target"]
+current = true
+
+[node name="ViewportLabel" type="Label" parent="."]
+text = "Viewport: 0x0"
+position = Vector2(16, 16)

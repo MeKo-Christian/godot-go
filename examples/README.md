@@ -9,3 +9,5 @@ This directory contains standalone Godot demo projects backed by godot-go.
 - `signal_demo/`: Custom signal emission and connection demo.
 - `ui_overlay_score/`: UI overlay demo with a score label.
 - `actions_input_demo/`: InputMap actions + polling demo.
+- `audio_visual_fx/`: AudioStreamPlayer2D + particles + AnimatedSprite2D + shader demo.
+- `camera_viewport/`: Camera2D follow + viewport size handling demo.
