@@ -30,17 +30,17 @@
 
 > **Priority:** Critical — fixes must come before new features
 
-### Task 1.1: Fix Critical Memory Leaks (Commented-Out Destroys)
+### Task 1.1: Fix Critical Memory Leaks (Commented-Out Destroys) ✅
 
 These are explicit `Destroy()` calls that were commented out — uncomment or fix:
 
-- [ ] [variant.go:453-470](pkg/builtin/variant.go#L453-L470) — `ZapVector2/3/4` logging functions leak Variants
-- [ ] [variant.go:134](pkg/builtin/variant.go#L134) — `getObjectInstanceBinding()` StringName leak
-- [ ] [classdb.go:197](pkg/core/classdb.go#L197) — Signal `PropertyInfo` array never destroyed
-- [ ] [method_bind.go:353](pkg/core/method_bind.go#L353) — Method name StringName not destroyed
-- [ ] [method_bind_reflect.go:206,515,524](pkg/core/method_bind_reflect.go#L206) — Multiple StringName leaks
-- [ ] [variant_string_encoder.go:69,82](pkg/builtin/variant_string_encoder.go#L69) — Encoder Destroy commented
-- [ ] [char_string.go:65](pkg/builtin/char_string.go#L65) — Buffer Destroy commented
+- [x] [variant.go:453-470](pkg/builtin/variant.go#L453-L470) — `ZapVector2/3/4` logging functions leak Variants
+- [x] [variant.go:134](pkg/builtin/variant.go#L134) — `getObjectInstanceBinding()` StringName leak
+- [x] [classdb.go:197](pkg/core/classdb.go#L197) — Signal `PropertyInfo` array (clarified: not a leak, ownership is correct)
+- [x] [method_bind.go:353](pkg/core/method_bind.go#L353) — Method name StringName (clarified: intentionally kept alive for Godot)
+- [x] [method_bind_reflect.go:206,515,524](pkg/core/method_bind_reflect.go#L206) — Dead code, not actual leaks
+- [x] [variant_string_encoder.go:69,82](pkg/builtin/variant_string_encoder.go#L69) — Encoder Destroy fixed
+- [x] [char_string.go:65](pkg/builtin/char_string.go#L65) — Buffer Destroy fixed
 
 ### Task 1.2: Implement rError Checking
 
