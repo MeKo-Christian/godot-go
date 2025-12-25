@@ -21,3 +21,8 @@ var (
 	GDRegisteredGDClassEncoders = NewSyncMap[string, ArgumentEncoder]()
 	pnr                         runtime.Pinner
 )
+
+// UnpinGDClassInitPins releases pins held for the extension lifetime during shutdown.
+func UnpinGDClassInitPins() {
+	pnr.Unpin()
+}

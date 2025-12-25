@@ -35,6 +35,11 @@ var (
 	pnr                                  runtime.Pinner
 )
 
+// UnpinCorePins releases pins held for the extension lifetime during shutdown.
+func UnpinCorePins() {
+	pnr.Unpin()
+}
+
 func CreateGDClassInstance(tn string) GDClass {
 	ci, ok := Internal.GDRegisteredGDClasses.Get(tn)
 	if !ok {

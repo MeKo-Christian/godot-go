@@ -35,6 +35,11 @@ var (
 	pnr                                                   = runtime.Pinner{}
 )
 
+// UnpinBuiltinPins releases pins held for the extension lifetime during shutdown.
+func UnpinBuiltinPins() {
+	pnr.Unpin()
+}
+
 func GDClassRegisterInstanceBindingCallbacks(tn string) {
 	// substitute for:
 	// static constexpr GDExtensionInstanceBindingCallbacks ___binding_callbacks = {

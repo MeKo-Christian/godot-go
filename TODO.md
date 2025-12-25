@@ -96,10 +96,10 @@ Currently **zero** `runtime.SetFinalizer` usage in codebase:
 
 Global `runtime.Pinner` objects are never unpinned:
 
-- [ ] [builtin/lib.go:35](pkg/builtin/lib.go#L35) — `pnr` never unpinned
-- [ ] [ffi/lib.go:18](pkg/ffi/lib.go#L18) — `pnr` never unpinned
-- [ ] [core/lib.go:35](pkg/core/lib.go#L35) — `pnr` never unpinned
-- [ ] Evaluate if unpinning is safe/necessary for long-running games
+- [x] [builtin/lib.go:35](pkg/builtin/lib.go#L35) — `pnr` unpinned on core deinit
+- [x] [ffi/lib.go:18](pkg/ffi/lib.go#L18) — `pnr` unpinned on core deinit
+- [x] [core/lib.go:35](pkg/core/lib.go#L35) — `pnr` unpinned on core deinit
+- [x] Evaluate if unpinning is safe/necessary for long-running games
 
 ### Task 1.7: Memory Leak Detection Tests
 

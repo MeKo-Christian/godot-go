@@ -12,6 +12,11 @@ var (
 	pnr     runtime.Pinner
 )
 
+// UnpinGDClassImplPins releases pins held for the extension lifetime during shutdown.
+func UnpinGDClassImplPins() {
+	pnr.Unpin()
+}
+
 func (cx *ObjectImpl) ToGoString() string {
 	if cx == nil || cx.Owner == nil {
 		return ""

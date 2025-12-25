@@ -17,6 +17,11 @@ import (
 
 var pnr = runtime.Pinner{}
 
+// UnpinFFIPins releases pins held for the extension lifetime during shutdown.
+func UnpinFFIPins() {
+	pnr.Unpin()
+}
+
 func NewGDExtensionInstanceBindingCallbacks(
 	createCallback GDExtensionInstanceBindingCreateCallback,
 	freeCallback GDExtensionInstanceBindingFreeCallback,

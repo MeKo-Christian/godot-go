@@ -15,3 +15,8 @@ var (
 	nullptr = unsafe.Pointer(nil)
 	pnr     runtime.Pinner
 )
+
+// UnpinGDUtilFuncPins releases pins held for the extension lifetime during shutdown.
+func UnpinGDUtilFuncPins() {
+	pnr.Unpin()
+}
