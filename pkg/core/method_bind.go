@@ -172,7 +172,7 @@ func NewGoMethodMetadata(
 type VarargCallFunc func(GDClass, ...Variant) Variant
 
 // Call is called by GDScript to call into Go
-func (md *GoMethodMetadata) Call(inst GDClass, gdArgs ...Variant) Variant {
+func (md *GoMethodMetadata) Call(inst GDClass, gdArgs ...Variant) (Variant, *GDExtensionCallError) {
 	gdArgsCount := len(gdArgs)
 	defArgsCount := len(md.gdeDefaultArgumentPtrs)
 	callArgs := make([]Variant, len(md.gdeArgumentTypes))
@@ -182,11 +182,14 @@ func (md *GoMethodMetadata) Call(inst GDClass, gdArgs ...Variant) Variant {
 		} else if i < defArgsCount {
 			callArgs[i] = md.DefaultArguments[i]
 		} else {
-			log.Panic("too few arguments",
+			log.Error("too few arguments",
 				zap.String("bind", md.String()),
 				zap.String("gd_args", VariantSliceToString(gdArgs)),
 				zap.String("defaults", VariantSliceToString(md.DefaultArguments)),
 			)
+			err := &GDExtensionCallError{}
+			err.SetErrorFields(GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS, int32(i), int32(len(md.gdeArgumentTypes)))
+			return NewVariantNil(), err
 		}
 	}
 	exepctedTypes := md.GoArgumentTypes
@@ -205,20 +208,33 @@ func (md *GoMethodMetadata) Call(inst GDClass, gdArgs ...Variant) Variant {
 		switch md.GoReturnStyle {
 		case NoneReturnStyle:
 		case ValueAndBoolReturnStyle:
-			log.Warn("second return value ignored")
+			// Check if second return value (error) is non-nil
+			if len(ret) > 1 && !ret[1].IsNil() {
+				log.Error("Go method returned error",
+					zap.String("bind", md.String()),
+					zap.Any("error", ret[1].Interface()),
+				)
+				err := &GDExtensionCallError{}
+				err.SetErrorFields(GDEXTENSION_CALL_ERROR_INVALID_METHOD, 0, 0)
+				return NewVariantNil(), err
+			}
 			fallthrough
 		case ValueReturnStyle:
 			// return ret[0].Interface().(Variant)
 			v := Variant{}
 			ptr := (GDExtensionUninitializedVariantPtr)(unsafe.Pointer(v.NativePtr()))
 			GDExtensionVariantPtrFromReflectValue(ret[0], ptr)
-			return v
+			return v, nil
 		default:
-			log.Panic("unexpected MethodBindReturnStyle",
+			log.Error("unexpected MethodBindReturnStyle",
 				zap.Any("value", ret),
+				zap.Any("style", md.GoReturnStyle),
 			)
+			err := &GDExtensionCallError{}
+			err.SetErrorFields(GDEXTENSION_CALL_ERROR_INVALID_METHOD, 0, 0)
+			return NewVariantNil(), err
 		}
-		return NewVariantNil()
+		return NewVariantNil(), nil
 	} else {
 		args := reflectFuncCallArgsFromGDExtensionConstVariantPtrSliceArgs(inst, callArgs, exepctedTypes)
 		log.Debug("Calling",
@@ -236,21 +252,34 @@ func (md *GoMethodMetadata) Call(inst GDClass, gdArgs ...Variant) Variant {
 		switch md.GoReturnStyle {
 		case NoneReturnStyle:
 		case ValueAndBoolReturnStyle:
-			log.Warn("second return value ignored")
+			// Check if second return value (error) is non-nil
+			if len(ret) > 1 && !ret[1].IsNil() {
+				log.Error("Go method returned error",
+					zap.String("bind", md.String()),
+					zap.Any("error", ret[1].Interface()),
+				)
+				err := &GDExtensionCallError{}
+				err.SetErrorFields(GDEXTENSION_CALL_ERROR_INVALID_METHOD, 0, 0)
+				return NewVariantNil(), err
+			}
 			fallthrough
 		case ValueReturnStyle:
 			v := Variant{}
 			ptr := (GDExtensionUninitializedVariantPtr)(unsafe.Pointer(v.NativePtr()))
 			pnr.Pin(ptr)
 			GDExtensionVariantPtrFromReflectValue(ret[0], ptr)
-			return v
+			return v, nil
 		default:
-			log.Panic("unexpected MethodBindReturnStyle",
+			log.Error("unexpected MethodBindReturnStyle",
 				zap.Any("value", ret),
+				zap.Any("style", md.GoReturnStyle),
 			)
+			err := &GDExtensionCallError{}
+			err.SetErrorFields(GDEXTENSION_CALL_ERROR_INVALID_METHOD, 0, 0)
+			return NewVariantNil(), err
 		}
 	}
-	return NewVariantNil()
+	return NewVariantNil(), nil
 }
 
 // Ptrcall is called by GDScript to call into Go

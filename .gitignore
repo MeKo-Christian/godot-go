@@ -46,9 +46,14 @@ cmd/generate/gdnativewrapper/gdnative_interface.intermediate.h
 .deprecated*/
 
 # =============================================================================
-# Claude AI Assistant Files
+# AI Agent files
 # =============================================================================
 .claude
 CLAUDE.md
 AGENTS.md
 .*.md
+
+# =============================================================================
+# Godot Configuration Files
+# =============================================================================
+.godot_config

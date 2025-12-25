@@ -27,16 +27,34 @@ func GoCallback_MethodBindMethodCall(
 	rReturn C.GDExtensionVariantPtr,
 	rError *C.GDExtensionCallError,
 ) {
-	// TODO: implement rError checking
+	// Add panic recovery to catch any panics and report them via rError
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error("panic in Go method callback",
+				zap.Any("panic", r),
+				zap.Stack("stack"),
+			)
+			// Set rError to indicate method call failed
+			callErr := (*GDExtensionCallError)(unsafe.Pointer(rError))
+			callErr.SetErrorFields(GDEXTENSION_CALL_ERROR_INVALID_METHOD, 0, 0)
+		}
+	}()
+
 	ud := (cgo.Handle)(methodUserData)
 	bind, ok := ud.Value().(*GoMethodMetadata)
 	if !ok || bind == nil {
-		log.Panic("unable to retrieve methodUserData")
+		log.Error("unable to retrieve methodUserData")
+		callErr := (*GDExtensionCallError)(unsafe.Pointer(rError))
+		callErr.SetErrorFields(GDEXTENSION_CALL_ERROR_INVALID_METHOD, 0, 0)
+		return
 	}
 	pnr.Pin(instPtr)
 	inst := ObjectClassFromGDExtensionClassInstancePtr((GDExtensionClassInstancePtr)(instPtr))
 	if inst == nil {
-		log.Panic("GDExtensionClassInstancePtr canoot be null")
+		log.Error("GDExtensionClassInstancePtr cannot be null")
+		callErr := (*GDExtensionCallError)(unsafe.Pointer(rError))
+		callErr.SetErrorFields(GDEXTENSION_CALL_ERROR_INSTANCE_IS_NULL, 0, 0)
+		return
 	}
 	pnr.Pin(inst)
 	cn := inst.GetClass()
@@ -52,7 +70,20 @@ func GoCallback_MethodBindMethodCall(
 		pnr.Pin(argPtrSlice[i])
 		args[i] = NewVariantCopyWithGDExtensionConstVariantPtr(argPtrSlice[i])
 	}
-	retCall := bind.Call(inst, args...)
+
+	// Call the Go method and check for errors
+	retCall, callErr := bind.Call(inst, args...)
+	if callErr != nil {
+		log.Error("method call failed",
+			zap.String("class", cn.ToUtf8()),
+			zap.String("method", bind.GdMethodName),
+			zap.Error(callErr),
+		)
+		// Copy error fields to rError
+		*(*GDExtensionCallError)(unsafe.Pointer(rError)) = *callErr
+		return
+	}
+
 	*(*Variant)(unsafe.Pointer(rReturn)) = retCall
 	pnr.Pin(rReturn)
 }

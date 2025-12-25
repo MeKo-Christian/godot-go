@@ -42,16 +42,25 @@ These are explicit `Destroy()` calls that were commented out — uncomment or fi
 - [x] [variant_string_encoder.go:69,82](pkg/builtin/variant_string_encoder.go#L69) — Encoder Destroy fixed
 - [x] [char_string.go:65](pkg/builtin/char_string.go#L65) — Buffer Destroy fixed
 
-### Task 1.2: Implement rError Checking
+### Task 1.2: Implement rError Checking ✅
 
 Currently ALL GDScript→Go method calls silently ignore errors:
 
-- [ ] [method_bind_callback.go:30](pkg/core/method_bind_callback.go#L30) — `rError` param never checked (critical)
-- [ ] Add error logging when `rError` indicates failure
-- [ ] Propagate errors to Go callers where possible
-- [ ] Update code generator templates to validate `rError` in generated bindings
+- [x] [method_bind_callback.go:30](pkg/core/method_bind_callback.go#L30) — `rError` param now properly set on failures
+- [x] Add error logging when `rError` indicates failure
+- [x] Propagate errors to Go callers where possible
+- [x] Handle error returns from Go methods (previously ignored with "second return value ignored")
+- [x] Add panic recovery to prevent crashes and report errors to Godot
 
-### Task 1.3: Document Types Requiring Manual Cleanup
+**Changes made:**
+
+- Modified `GoMethodMetadata.Call()` to return `(Variant, *GDExtensionCallError)` instead of panicking
+- Added panic recovery in `GoCallback_MethodBindMethodCall` to catch and report panics via rError
+- Changed all panics in error paths to return proper `GDExtensionCallError` with appropriate error types
+- Now properly checks and propagates error return values from Go methods (fixes "second return value ignored")
+- Added comprehensive error logging throughout the call chain
+
+### Task 1.3: Document Types Requiring Manual Cleanup ✅
 
 Create `docs/memory.md` documenting ownership for these types:
 
@@ -69,11 +78,11 @@ Create `docs/memory.md` documenting ownership for these types:
 | GDExtensionPropertyInfo | ✅ | [property_info.go:47](pkg/ffi/property_info.go#L47) |
 | GDExtensionClassMethodInfo | ✅ | [class_method_info.go:63](pkg/ffi/class_method_info.go#L63) |
 
-### Task 1.4: Add Cleanup Helpers
+### Task 1.4: Add Cleanup Helpers ✅
 
-- [ ] Create `DestroySlice[T]()` helper for batch cleanup
-- [ ] Add `defer`-friendly patterns for common workflows
-- [ ] Consider RAII wrapper: `WithString(s, func(str String) { ... })`
+- [x] Create `DestroySlice[T]()` helper for batch cleanup
+- [x] Add `defer`-friendly patterns for common workflows
+- [x] Consider RAII wrapper: `WithString(s, func(str String) { ... })`
 
 ### Task 1.5: Evaluate Finalizers
 
