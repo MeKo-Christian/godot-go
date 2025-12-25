@@ -78,7 +78,7 @@ lint-fix:
 #################################
 
 # Generate a new Go class skeleton
-new-class NAME parent="Node" out="." package="" ready=true force=false:
+new-class NAME parent="Node" out="." package="" ready="true" force="false":
     go run ./cmd -- new-class "{{ NAME }}" --parent "{{ parent }}" --out "{{ out }}" --package "{{ package }}" --ready={{ ready }} --force={{ force }}
 
 #################################

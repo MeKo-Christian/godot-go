@@ -145,17 +145,17 @@ Global `runtime.Pinner` objects are never unpinned:
   - [x] Verify physics material properties (friction, bounce)
   - [x] Test joint constraints (PinJoint2D for flippers)
 
-- [ ] **Task 3.2: Create pinball-specific examples**
-  - [ ] Flipper controller (RigidBody2D + input + joint)
-  - [ ] Ball launcher (impulse application)
-  - [ ] Bumper (Area2D + signal + impulse response)
-  - [ ] Drain detection (Area2D trigger)
-  - [ ] Score system (signals + UI binding)
+- [x] **Task 3.2: Create pinball-specific examples**
+  - [x] Flipper controller (RigidBody2D + input + joint)
+  - [x] Ball launcher (impulse application)
+  - [x] Bumper (Area2D + signal + impulse response)
+  - [x] Drain detection (Area2D trigger)
+  - [x] Score system (signals + UI binding)
 
-- [ ] **Task 3.3: Input responsiveness**
-  - [ ] Test rapid input handling (critical for flipper response)
-  - [ ] Verify `V_Input` vs `V_UnhandledInput` behavior
-  - [ ] Document input buffering if needed
+- [x] **Task 3.3: Input responsiveness**
+  - [x] Test rapid input handling (critical for flipper response)
+  - [x] Verify `V_Input` vs `V_UnhandledInput` behavior
+  - [x] Document input buffering if needed
 
 ---
 

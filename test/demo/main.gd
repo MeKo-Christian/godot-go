@@ -9,12 +9,14 @@ class TestClass:
 func _ready():
 	var example: Example = $Example
 	var physics: PhysicsValidation = $PhysicsValidation
+	var input_probe: InputProbe = $InputProbe
 	if OS.has_environment("GODOT_GO_LEAK_TEST"):
 		await run_leak_test(example)
 		exit_with_status()
 		return
 	test_suite(1, example)
 	await physics_test_suite(physics)
+	await input_test_suite(input_probe)
 	# example.group_subgroup_custom_position = Vector2(0, 0)
 	# custom_signal_emitted = null
 	# var t = get_tree()
@@ -302,6 +304,31 @@ func setup_physics_rig() -> Dictionary:
 func wait_physics_frames(count: int) -> void:
 	for _i in range(count):
 		await get_tree().physics_frame
+
+func input_test_suite(probe: InputProbe) -> void:
+	print("input test suite run")
+	probe.reset_counts()
+	probe.set_handle_input(false)
+	await get_tree().process_frame
+	send_key_events(KEY_SPACE, 20)
+	await get_tree().process_frame
+	assert_equal(probe.get_input_count(), 20)
+	assert_equal(probe.get_unhandled_count(), 20)
+
+	probe.reset_counts()
+	probe.set_handle_input(true)
+	await get_tree().process_frame
+	send_key_events(KEY_SPACE, 15)
+	await get_tree().process_frame
+	assert_equal(probe.get_input_count(), 15)
+	assert_equal(probe.get_unhandled_count(), 0)
+
+func send_key_events(keycode: Key, count: int) -> void:
+	for _i in range(count):
+		var ev := InputEventKey.new()
+		ev.keycode = keycode
+		ev.pressed = true
+		Input.parse_input_event(ev)
 	# assert_equal(custom_callable.get_object(), null);
 	# assert_equal(custom_callable.get_method(), "");
 	# assert_equal(str(custom_callable), "<MyCallableCustom>");

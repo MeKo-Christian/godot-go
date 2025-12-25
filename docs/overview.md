@@ -8,6 +8,7 @@ Standalone demo projects live under `examples/`. Current set:
 
 - `hello_world/` - minimal Go-backed node that prints on `_ready`
 - `physics_2d_bouncing_ball/` - RigidBody2D bouncing ball
+- `pinball_mechanics/` - Pinball mechanics (flippers, launcher, bumpers, drain, score)
 - `input_handling/` - keyboard/mouse event logging
 - `signal_demo/` - custom signal emission and connection
 - `ui_overlay_score/` - UI overlay with a score label

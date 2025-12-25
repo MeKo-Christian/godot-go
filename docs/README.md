@@ -8,4 +8,5 @@ Start here:
 - GDScript-to-Go cheat sheet: `docs/cheatsheet.md`
 - Signals: `docs/signals.md`
 - Physics: `docs/physics.md`
+- Input: `docs/input.md`
 - Common API reference: `docs/api_reference.md`
