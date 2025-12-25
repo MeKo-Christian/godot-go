@@ -61,7 +61,13 @@ The expected output can be found in the CI logs.
 
 ## Documentation
 
-A living doc of godot-go is maintained at [docs/overview.md](docs/overview.md).
+See the documentation index at [docs/README.md](docs/README.md), plus these key guides:
+
+- [Getting Started](docs/getting-started.md)
+- [GDScript to Go Cheat Sheet](docs/cheatsheet.md)
+- [Signals](docs/signals.md)
+- [Physics Patterns](docs/physics.md)
+- [Common API Reference](docs/api_reference.md)
 
 ## Contact
 
