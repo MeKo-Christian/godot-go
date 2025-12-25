@@ -113,25 +113,24 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** High — makes the library usable for real projects
 
-- [ ] **Documentation**
-  - [ ] Complete API reference for common game dev classes
-  - [ ] Add "Getting Started" guide with minimal project setup
-  - [ ] Document GDScript-to-Go patterns (cheat sheet)
-  - [ ] Add physics examples (RigidBody2D, impulses, collisions)
-  - [ ] Document signal connection patterns
+- [x] **Documentation**
+  - [x] Complete API reference for common game dev classes
+  - [x] Add "Getting Started" guide with minimal project setup
+  - [x] Document GDScript-to-Go patterns (cheat sheet)
+  - [x] Add physics examples (RigidBody2D, impulses, collisions)
+  - [x] Document signal connection patterns
 
-- [ ] **Examples**
-  - [ ] Create `examples/` directory with standalone demos
-  - [ ] Minimal "Hello World" scene
-  - [ ] 2D physics demo (bouncing ball)
-  - [ ] Input handling demo (keyboard + mouse)
-  - [ ] Signal communication demo
-  - [ ] UI overlay demo (score display)
+- [x] **Examples**
+  - [x] Create `examples/` directory with standalone demos
+  - [x] Minimal "Hello World" scene
+  - [x] 2D physics demo (bouncing ball)
+  - [x] Input handling demo (keyboard + mouse)
+  - [x] Signal communication demo
+  - [x] UI overlay demo (score display)
 
-- [ ] **Tooling**
-  - [ ] Add `just new-class <ClassName>` generator for boilerplate
-  - [ ] Improve error messages from code generator
-  - [ ] Add VS Code snippets for common patterns
+- [x] **Tooling**
+  - [x] Add `just new-class <ClassName>` generator for boilerplate
+  - [x] Improve error messages from code generator
 
 ---
 
@@ -139,21 +138,21 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** High — enables the target use case
 
-- [ ] **Physics validation**
-  - [ ] Test RigidBody2D with continuous collision (ball physics)
-  - [ ] Test impulse application (flipper hits)
-  - [ ] Test Area2D triggers (bumpers, drain detection)
-  - [ ] Verify physics material properties (friction, bounce)
-  - [ ] Test joint constraints (PinJoint2D for flippers)
+- [x] **Task 3.1: Physics validation**
+  - [x] Test RigidBody2D with continuous collision (ball physics)
+  - [x] Test impulse application (flipper hits)
+  - [x] Test Area2D triggers (bumpers, drain detection)
+  - [x] Verify physics material properties (friction, bounce)
+  - [x] Test joint constraints (PinJoint2D for flippers)
 
-- [ ] **Create pinball-specific examples**
+- [ ] **Task 3.2: Create pinball-specific examples**
   - [ ] Flipper controller (RigidBody2D + input + joint)
   - [ ] Ball launcher (impulse application)
   - [ ] Bumper (Area2D + signal + impulse response)
   - [ ] Drain detection (Area2D trigger)
   - [ ] Score system (signals + UI binding)
 
-- [ ] **Input responsiveness**
+- [ ] **Task 3.3: Input responsiveness**
   - [ ] Test rapid input handling (critical for flipper response)
   - [ ] Verify `V_Input` vs `V_UnhandledInput` behavior
   - [ ] Document input buffering if needed
@@ -164,19 +163,19 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** Medium — enhances game feel
 
-- [ ] **Audio**
+- [ ] **Task 4.1: Audio**
   - [ ] Test AudioStreamPlayer2D with godot-go
   - [ ] Verify audio loading from resources
   - [ ] Create audio playback example
   - [ ] Document spatial audio setup
 
-- [ ] **Visual effects**
+- [ ] **Task 4.2: Visual effects**
   - [ ] Test GPUParticles2D for ball impacts
   - [ ] Verify AnimatedSprite2D frame control
   - [ ] Test shader material application
   - [ ] Document canvas drawing (if needed)
 
-- [ ] **Camera & Viewport**
+- [ ] **Task 4.3: Camera & Viewport**
   - [ ] Test Camera2D following
   - [ ] Verify viewport scaling/resolution handling
 
@@ -186,19 +185,19 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** Medium — for shipping games
 
-- [ ] **Performance**
+- [ ] **Task 5.1: Performance**
   - [ ] Profile cgo overhead in hot loops
   - [ ] Identify and document performance-critical patterns
   - [ ] Add object pooling utilities for common types
   - [ ] Benchmark physics-heavy scenarios
 
-- [ ] **Testing infrastructure**
+- [ ] **Task 5.2: Testing infrastructure**
   - [ ] Add unit tests for all builtin types
   - [ ] Add integration tests for class registration
   - [ ] Add physics simulation tests
   - [ ] CI: Run tests on multiple platforms
 
-- [ ] **Build & Distribution**
+- [ ] **Task 5.3: Build & Distribution**
   - [ ] Document cross-compilation for Windows/Mac/Linux
   - [ ] Test export workflow
   - [ ] Document debugging compiled extensions
@@ -209,17 +208,17 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** Low — nice to have
 
-- [ ] **Goroutine integration**
+- [ ] **Task 6.1: Goroutine integration**
   - [ ] Safe goroutine usage with Godot thread model
   - [ ] Signal-to-channel bridges
   - [ ] Async resource loading patterns
 
-- [ ] **Editor integration**
+- [ ] **Task 6.2: Editor integration**
   - [ ] Custom inspector properties
   - [ ] Tool scripts (running in editor)
   - [ ] Custom resource types
 
-- [ ] **3D support validation**
+- [ ] **Task 6.3: 3D support validation**
   - [ ] Test RigidBody3D, CharacterBody3D
   - [ ] Verify 3D collision detection
   - [ ] Camera3D and viewport handling

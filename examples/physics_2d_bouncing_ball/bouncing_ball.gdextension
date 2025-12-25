@@ -1,0 +1,17 @@
+[configuration]
+
+entry_symbol = "BouncingBallInit"
+compatibility_minimum = 4.5
+
+[libraries]
+
+macos.debug.x86_64 = "res://lib/libgodotgo-bouncing-ball-macos-amd64.framework"
+macos.release.x86_64 = "res://lib/libgodotgo-bouncing-ball-macos-amd64.framework"
+macos.debug.arm64 = "res://lib/libgodotgo-bouncing-ball-macos-arm64.framework"
+macos.release.arm64 = "res://lib/libgodotgo-bouncing-ball-macos-arm64.framework"
+windows.debug.x86_64 = "res://lib/libgodotgo-bouncing-ball-windows-amd64.dll"
+windows.release.x86_64 = "res://lib/libgodotgo-bouncing-ball-windows-amd64.dll"
+linux.debug.x86_64 = "res://lib/libgodotgo-bouncing-ball-linux-amd64.so"
+linux.release.x86_64 = "res://lib/libgodotgo-bouncing-ball-linux-amd64.so"
+linux.debug.arm64 = "res://lib/libgodotgo-bouncing-ball-linux-arm64.so"
+linux.release.arm64 = "res://lib/libgodotgo-bouncing-ball-linux-arm64.so"

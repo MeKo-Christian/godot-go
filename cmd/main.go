@@ -106,18 +106,32 @@ var rootCmd = &cobra.Command{
 			if verbose {
 				println("Generating gdextension C wrapper functions...")
 			}
-			ffi.Generate(packagePath, ast)
+			if err := ffi.Generate(packagePath, ast); err != nil {
+				return fmt.Errorf("generate ffi: %w", err)
+			}
 		}
 		if genExtensionAPI {
 			if verbose {
 				println("Generating extension api...")
 			}
-			builtin.Generate(packagePath, ast, eapi)
-			gdclassinit.Generate(packagePath, eapi)
-			gdclassimpl.Generate(packagePath, eapi)
-			constant.Generate(packagePath, eapi)
-			nativestructure.Generate(packagePath, eapi)
-			gdutilfunc.Generate(packagePath, eapi)
+			if err := builtin.Generate(packagePath, ast, eapi); err != nil {
+				return fmt.Errorf("generate builtin: %w", err)
+			}
+			if err := gdclassinit.Generate(packagePath, eapi); err != nil {
+				return fmt.Errorf("generate gdclassinit: %w", err)
+			}
+			if err := gdclassimpl.Generate(packagePath, eapi); err != nil {
+				return fmt.Errorf("generate gdclassimpl: %w", err)
+			}
+			if err := constant.Generate(packagePath, eapi); err != nil {
+				return fmt.Errorf("generate constant: %w", err)
+			}
+			if err := nativestructure.Generate(packagePath, eapi); err != nil {
+				return fmt.Errorf("generate nativestructure: %w", err)
+			}
+			if err := gdutilfunc.Generate(packagePath, eapi); err != nil {
+				return fmt.Errorf("generate gdutilfunc: %w", err)
+			}
 		}
 		if verbose {
 			println("cli tool done")

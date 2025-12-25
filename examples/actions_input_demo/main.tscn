@@ -1,0 +1,9 @@
+[gd_scene load_steps=1 format=3]
+
+[node name="Main" type="Node"]
+
+[node name="ActionDemo" type="ActionInputDemo" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="ActionDemo"]
+text = "Score: 0"
+position = Vector2(16, 16)

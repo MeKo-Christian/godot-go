@@ -20,14 +20,14 @@ var (
 )
 
 // Generate will generate Go wrappers for all Godot base types
-func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var err error
-	if err = GenerateClasses(projectPath, eapi); err != nil {
-		panic(err)
+func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) error {
+	if err := GenerateClasses(projectPath, eapi); err != nil {
+		return fmt.Errorf("classes: %w", err)
 	}
-	if err = GenerateClassRefs(projectPath, eapi); err != nil {
-		panic(err)
+	if err := GenerateClassRefs(projectPath, eapi); err != nil {
+		return fmt.Errorf("class refs: %w", err)
 	}
+	return nil
 }
 
 func GenerateClasses(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -49,31 +49,18 @@ func GenerateClasses(projectPath string, extensionApi extensionapiparser.Extensi
 		}).
 		Parse(classesText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "gdclassimpl", fmt.Sprintf("classes.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateClassRefs(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -95,29 +82,28 @@ func GenerateClassRefs(projectPath string, extensionApi extensionapiparser.Exten
 		}).
 		Parse(classesRefsText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.refs.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.refs.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "gdclassimpl", fmt.Sprintf("classes.refs.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
+	return writeGeneratedFile(filename, b.Bytes())
+}
 
+func writeGeneratedFile(path string, data []byte) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("create %s: %w", path, err)
+	}
 	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
+	if _, err := f.Write(data); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
 	}
-
 	return nil
 }

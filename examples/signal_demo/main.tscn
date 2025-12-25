@@ -1,0 +1,7 @@
+[gd_scene load_steps=1 format=3]
+
+[node name="Main" type="Node"]
+
+[node name="Emitter" type="SignalEmitter" parent="."]
+
+[node name="Listener" type="SignalListener" parent="."]

@@ -8,11 +8,13 @@ class TestClass:
 
 func _ready():
 	var example: Example = $Example
+	var physics: PhysicsValidation = $PhysicsValidation
 	if OS.has_environment("GODOT_GO_LEAK_TEST"):
 		await run_leak_test(example)
 		exit_with_status()
 		return
 	test_suite(1, example)
+	await physics_test_suite(physics)
 	# example.group_subgroup_custom_position = Vector2(0, 0)
 	# custom_signal_emitted = null
 	# var t = get_tree()
@@ -198,6 +200,108 @@ func test_suite(i: int, example: Example):
 	# assert_equal(custom_callable.is_valid(), true);
 	# assert_equal(custom_callable.call(), "Hi")
 	# assert_equal(custom_callable.hash(), 27);
+
+func physics_test_suite(physics: PhysicsValidation) -> void:
+	print("physics test suite run")
+	var rig := setup_physics_rig()
+	await get_tree().physics_frame
+
+	assert_true(physics.enable_ccd(rig.ball))
+
+	var material := PhysicsMaterial.new()
+	assert_true(physics.configure_material(rig.ball, material, 0.2, 0.8))
+
+	physics.reset_area_counts()
+	assert_true(physics.bind_area(rig.trigger))
+
+	physics.apply_flipper_impulse(rig.ball, Vector2(0, 400), Vector2.ZERO)
+	await wait_physics_frames(10)
+
+	assert_true(physics.get_linear_speed(rig.ball) > 0.1)
+	assert_true(physics.get_area_enter_count() > 0)
+
+	var node_a := str(rig.joint.get_path_to(rig.anchor))
+	var node_b := str(rig.joint.get_path_to(rig.flipper))
+	assert_true(physics.configure_pin_joint(rig.joint, node_a, node_b, -0.5, 0.5, 0.2, 8.0))
+
+func setup_physics_rig() -> Dictionary:
+	var rig_root := Node2D.new()
+	rig_root.name = "PhysicsRig"
+	add_child(rig_root)
+
+	var ball := RigidBody2D.new()
+	ball.name = "Ball"
+	ball.position = Vector2(200, 60)
+	ball.contact_monitor = true
+	ball.max_contacts_reported = 4
+	var ball_shape := CollisionShape2D.new()
+	var ball_circle := CircleShape2D.new()
+	ball_circle.radius = 6.0
+	ball_shape.shape = ball_circle
+	ball.add_child(ball_shape)
+	rig_root.add_child(ball)
+
+	var floor := StaticBody2D.new()
+	floor.name = "Floor"
+	floor.position = Vector2(200, 260)
+	var floor_shape := CollisionShape2D.new()
+	var floor_rect := RectangleShape2D.new()
+	floor_rect.size = Vector2(240, 12)
+	floor_shape.shape = floor_rect
+	floor.add_child(floor_shape)
+	rig_root.add_child(floor)
+
+	var trigger := Area2D.new()
+	trigger.name = "Trigger"
+	trigger.position = Vector2(200, 180)
+	trigger.monitoring = true
+	trigger.monitorable = true
+	var trigger_shape := CollisionShape2D.new()
+	var trigger_rect := RectangleShape2D.new()
+	trigger_rect.size = Vector2(80, 12)
+	trigger_shape.shape = trigger_rect
+	trigger.add_child(trigger_shape)
+	rig_root.add_child(trigger)
+
+	var anchor := StaticBody2D.new()
+	anchor.name = "FlipperAnchor"
+	anchor.position = Vector2(60, 220)
+	var anchor_shape := CollisionShape2D.new()
+	var anchor_rect := RectangleShape2D.new()
+	anchor_rect.size = Vector2(10, 10)
+	anchor_shape.shape = anchor_rect
+	anchor.add_child(anchor_shape)
+	rig_root.add_child(anchor)
+
+	var flipper := RigidBody2D.new()
+	flipper.name = "Flipper"
+	flipper.position = Vector2(80, 220)
+	flipper.gravity_scale = 0.0
+	var flipper_shape := CollisionShape2D.new()
+	var flipper_rect := RectangleShape2D.new()
+	flipper_rect.size = Vector2(40, 8)
+	flipper_shape.shape = flipper_rect
+	flipper.add_child(flipper_shape)
+	rig_root.add_child(flipper)
+
+	var joint := PinJoint2D.new()
+	joint.name = "FlipperJoint"
+	joint.position = anchor.position
+	rig_root.add_child(joint)
+
+	return {
+		"root": rig_root,
+		"ball": ball,
+		"floor": floor,
+		"trigger": trigger,
+		"anchor": anchor,
+		"flipper": flipper,
+		"joint": joint,
+	}
+
+func wait_physics_frames(count: int) -> void:
+	for _i in range(count):
+		await get_tree().physics_frame
 	# assert_equal(custom_callable.get_object(), null);
 	# assert_equal(custom_callable.get_method(), "");
 	# assert_equal(str(custom_callable), "<MyCallableCustom>");

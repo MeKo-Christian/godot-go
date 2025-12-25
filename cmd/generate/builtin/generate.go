@@ -31,24 +31,23 @@ var (
 	classesRefInterfacesText string
 )
 
-func Generate(projectPath string, ast clang.CHeaderFileAST, eapi extensionapiparser.ExtensionApi) {
-	err := GenerateBuiltinClasses(projectPath, eapi)
-	if err != nil {
-		panic(err)
+func Generate(projectPath string, ast clang.CHeaderFileAST, eapi extensionapiparser.ExtensionApi) error {
+	if err := GenerateBuiltinClasses(projectPath, eapi); err != nil {
+		return fmt.Errorf("builtin classes: %w", err)
 	}
-	if err = GenerateBuiltinClassBindings(projectPath, eapi); err != nil {
-		panic(err)
+	if err := GenerateBuiltinClassBindings(projectPath, eapi); err != nil {
+		return fmt.Errorf("builtin class bindings: %w", err)
 	}
-	if err = GenerateClassInterfaces(projectPath, eapi); err != nil {
-		panic(err)
+	if err := GenerateClassInterfaces(projectPath, eapi); err != nil {
+		return fmt.Errorf("class interfaces: %w", err)
 	}
-	if err = GenerateClassRefInterfaces(projectPath, eapi); err != nil {
-		panic(err)
+	if err := GenerateClassRefInterfaces(projectPath, eapi); err != nil {
+		return fmt.Errorf("class ref interfaces: %w", err)
 	}
-	err = GenerateVariantGoFile(projectPath, ast)
-	if err != nil {
-		panic(err)
+	if err := GenerateVariantGoFile(projectPath, ast); err != nil {
+		return fmt.Errorf("variant: %w", err)
 	}
+	return nil
 }
 
 func GenerateBuiltinClasses(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -70,31 +69,18 @@ func GenerateBuiltinClasses(projectPath string, extensionApi extensionapiparser.
 		}).
 		Parse(builtinClassesText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template builtinclasses.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template builtinclasses.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("builtinclasses.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateBuiltinClassBindings(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -108,31 +94,18 @@ func GenerateBuiltinClassBindings(projectPath string, extensionApi extensionapip
 		}).
 		Parse(builtinClassesBindingsText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template builtinclasses.bindings.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template builtinclasses.bindings.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("builtinclasses.bindings.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateClassInterfaces(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -147,31 +120,18 @@ func GenerateClassInterfaces(projectPath string, extensionApi extensionapiparser
 		}).
 		Parse(classesInterfacesText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.interfaces.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.interfaces.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("classes.interfaces.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateClassRefInterfaces(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -182,30 +142,29 @@ func GenerateClassRefInterfaces(projectPath string, extensionApi extensionapipar
 		}).
 		Parse(classesRefInterfacesText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.ref.instances.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.ref.instances.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "builtin", fmt.Sprintf("classes.ref.interfaces.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
+	return writeGeneratedFile(filename, b.Bytes())
+}
 
+func writeGeneratedFile(path string, data []byte) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("create %s: %w", path, err)
+	}
 	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
+	if _, err := f.Write(data); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
 	}
-
 	return nil
 }
 
@@ -221,18 +180,14 @@ func GenerateVariantGoFile(projectPath string, ast clang.CHeaderFileAST) error {
 		Funcs(funcs).
 		Parse(variantGoText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template variant.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
-	err = tmpl.Execute(&b, ast)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, ast); err != nil {
+		return fmt.Errorf("execute template variant.gen.go: %w", err)
 	}
 
 	goFileName := filepath.Join(projectPath, "pkg", "builtin", "variant.gen.go")
-	f, err := os.Create(goFileName)
-	f.Write(b.Bytes())
-	f.Close()
-	return nil
+	return writeGeneratedFile(goFileName, b.Bytes())
 }

@@ -16,11 +16,11 @@ import (
 var nativeStructuresText string
 
 // Generate will generate Go wrappers for all Godot base types
-func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var err error
-	if err = GenerateNativeStrucutres(projectPath, eapi); err != nil {
-		panic(err)
+func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) error {
+	if err := GenerateNativeStrucutres(projectPath, eapi); err != nil {
+		return fmt.Errorf("native structures: %w", err)
 	}
+	return nil
 }
 
 func GenerateNativeStrucutres(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -31,29 +31,28 @@ func GenerateNativeStrucutres(projectPath string, extensionApi extensionapiparse
 		}).
 		Parse(nativeStructuresText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template nativestructures.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template nativestructures.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "nativestructure", fmt.Sprintf("nativestructures.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
+	return writeGeneratedFile(filename, b.Bytes())
+}
 
+func writeGeneratedFile(path string, data []byte) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("create %s: %w", path, err)
+	}
 	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
+	if _, err := f.Write(data); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
 	}
-
 	return nil
 }

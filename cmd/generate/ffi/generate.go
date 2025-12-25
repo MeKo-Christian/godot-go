@@ -6,6 +6,7 @@ package ffi
 import (
 	"bytes"
 	_ "embed"
+	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -28,23 +29,20 @@ var (
 	ffiFileText string
 )
 
-func Generate(projectPath string, ast clang.CHeaderFileAST) {
-	err := GenerateGDExtensionWrapperHeaderFile(projectPath, ast)
-	if err != nil {
-		panic(err)
+func Generate(projectPath string, ast clang.CHeaderFileAST) error {
+	if err := GenerateGDExtensionWrapperHeaderFile(projectPath, ast); err != nil {
+		return fmt.Errorf("ffi wrapper header: %w", err)
 	}
-	err = GenerateGDExtensionWrapperSrcFile(projectPath, ast)
-	if err != nil {
-		panic(err)
+	if err := GenerateGDExtensionWrapperSrcFile(projectPath, ast); err != nil {
+		return fmt.Errorf("ffi wrapper source: %w", err)
 	}
-	err = GenerateGDExtensionWrapperGoFile(projectPath, ast)
-	if err != nil {
-		panic(err)
+	if err := GenerateGDExtensionWrapperGoFile(projectPath, ast); err != nil {
+		return fmt.Errorf("ffi wrapper go: %w", err)
 	}
-	err = GenerateGDExtensionInterfaceGoFile(projectPath, ast)
-	if err != nil {
-		panic(err)
+	if err := GenerateGDExtensionInterfaceGoFile(projectPath, ast); err != nil {
+		return fmt.Errorf("ffi interface go: %w", err)
 	}
+	return nil
 }
 
 func GenerateGDExtensionWrapperHeaderFile(projectPath string, ast clang.CHeaderFileAST) error {
@@ -54,27 +52,16 @@ func GenerateGDExtensionWrapperHeaderFile(projectPath string, ast clang.CHeaderF
 		}).
 		Parse(ffiWrapperHeaderFileText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template ffi_wrapper.gen.h: %w", err)
 	}
 
 	var b bytes.Buffer
-	err = tmpl.Execute(&b, ast)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, ast); err != nil {
+		return fmt.Errorf("execute template ffi_wrapper.gen.h: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "ffi", "ffi_wrapper.gen.h")
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateGDExtensionWrapperSrcFile(projectPath string, ast clang.CHeaderFileAST) error {
@@ -84,20 +71,16 @@ func GenerateGDExtensionWrapperSrcFile(projectPath string, ast clang.CHeaderFile
 		}).
 		Parse(ffiWrapperSrcFileText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template ffi_wrapper.gen.c: %w", err)
 	}
 
 	var b bytes.Buffer
-	err = tmpl.Execute(&b, ast)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, ast); err != nil {
+		return fmt.Errorf("execute template ffi_wrapper.gen.c: %w", err)
 	}
 
 	headerFileName := filepath.Join(projectPath, "pkg", "ffi", "ffi_wrapper.gen.c")
-	f, err := os.Create(headerFileName)
-	f.Write(b.Bytes())
-	f.Close()
-	return nil
+	return writeGeneratedFile(headerFileName, b.Bytes())
 }
 
 func GenerateGDExtensionWrapperGoFile(projectPath string, ast clang.CHeaderFileAST) error {
@@ -119,20 +102,16 @@ func GenerateGDExtensionWrapperGoFile(projectPath string, ast clang.CHeaderFileA
 		Funcs(funcs).
 		Parse(ffiWrapperGoFileText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template ffi_wrapper.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
-	err = tmpl.Execute(&b, ast)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, ast); err != nil {
+		return fmt.Errorf("execute template ffi_wrapper.gen.go: %w", err)
 	}
 
 	headerFileName := filepath.Join(projectPath, "pkg", "ffi", "ffi_wrapper.gen.go")
-	f, err := os.Create(headerFileName)
-	f.Write(b.Bytes())
-	f.Close()
-	return nil
+	return writeGeneratedFile(headerFileName, b.Bytes())
 }
 
 func GenerateGDExtensionInterfaceGoFile(projectPath string, ast clang.CHeaderFileAST) error {
@@ -155,18 +134,26 @@ func GenerateGDExtensionInterfaceGoFile(projectPath string, ast clang.CHeaderFil
 		Funcs(funcs).
 		Parse(ffiFileText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template ffi.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
-	err = tmpl.Execute(&b, ast)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, ast); err != nil {
+		return fmt.Errorf("execute template ffi.gen.go: %w", err)
 	}
 
 	headerFileName := filepath.Join(projectPath, "pkg", "ffi", "ffi.gen.go")
-	f, err := os.Create(headerFileName)
-	f.Write(b.Bytes())
-	f.Close()
+	return writeGeneratedFile(headerFileName, b.Bytes())
+}
+
+func writeGeneratedFile(path string, data []byte) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("create %s: %w", path, err)
+	}
+	defer f.Close()
+	if _, err := f.Write(data); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
+	}
 	return nil
 }

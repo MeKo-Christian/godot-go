@@ -2,6 +2,17 @@
 
 This will be a living doc which will provide an overview of key concepts in the godot-go bidnings.
 
+# Examples
+
+Standalone demo projects live under `examples/`. Current set:
+
+- `hello_world/` - minimal Go-backed node that prints on `_ready`
+- `physics_2d_bouncing_ball/` - RigidBody2D bouncing ball
+- `input_handling/` - keyboard/mouse event logging
+- `signal_demo/` - custom signal emission and connection
+- `ui_overlay_score/` - UI overlay with a score label
+- `actions_input_demo/` - InputMap actions + polling
+
 # GDScript Language Feature Mapping
 
 There are a lot of language features supported by GDScript that does not map cleanly to Go.

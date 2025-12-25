@@ -69,6 +69,25 @@ See the documentation index at [docs/README.md](docs/README.md), plus these key 
 - [Physics Patterns](docs/physics.md)
 - [Common API Reference](docs/api_reference.md)
 
+## Examples
+
+See [examples/README.md](examples/README.md) for standalone demo projects. Current examples:
+
+- [Hello World](examples/hello_world/)
+- [2D Physics: Bouncing Ball](examples/physics_2d_bouncing_ball/)
+- [Input Handling Demo](examples/input_handling/)
+- [Signal Demo](examples/signal_demo/)
+- [UI Overlay: Score Display](examples/ui_overlay_score/)
+- [Actions Input Demo](examples/actions_input_demo/)
+
+## Tooling
+
+Generate a Go class skeleton:
+
+```bash
+just new-class PlayerCharacter parent=CharacterBody2D out=./game package=game
+```
+
 ## Contact
 
 I'm happy to help out anyone interested in the project. Please leave a message in the [Discussion boards](https://github.com/godot-go/godot-go/discussions) or you can add me (surgical#3758) as a friend on the [Godot Engine Discord](https://discord.gg/qZHMsDg) servers. I primarily frequent the **gdnative-dev** room.

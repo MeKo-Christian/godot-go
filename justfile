@@ -74,6 +74,14 @@ lint-fix:
     golangci-lint run --config ./.golangci.toml --timeout 2m --fix
 
 #################################
+# Tooling
+#################################
+
+# Generate a new Go class skeleton
+new-class NAME parent="Node" out="." package="" ready=true force=false:
+    go run ./cmd -- new-class "{{ NAME }}" --parent "{{ parent }}" --out "{{ out }}" --package "{{ package }}" --ready={{ ready }} --force={{ force }}
+
+#################################
 # Checks (for CI)
 #################################
 

@@ -23,17 +23,17 @@ var (
 )
 
 // Generate will generate Go wrappers for all Godot base types
-func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) {
-	var err error
-	if err = GenerateCHeaderClassCallbacks(projectPath, eapi); err != nil {
-		panic(err)
+func Generate(projectPath string, eapi extensionapiparser.ExtensionApi) error {
+	if err := GenerateCHeaderClassCallbacks(projectPath, eapi); err != nil {
+		return fmt.Errorf("class callbacks header: %w", err)
 	}
-	if err = GenerateCClassCallbacks(projectPath, eapi); err != nil {
-		panic(err)
+	if err := GenerateCClassCallbacks(projectPath, eapi); err != nil {
+		return fmt.Errorf("class callbacks c: %w", err)
 	}
-	if err = GenerateClassInit(projectPath, eapi); err != nil {
-		panic(err)
+	if err := GenerateClassInit(projectPath, eapi); err != nil {
+		return fmt.Errorf("class init: %w", err)
 	}
+	return nil
 }
 
 func GenerateClassInit(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -51,31 +51,18 @@ func GenerateClassInit(projectPath string, extensionApi extensionapiparser.Exten
 		}).
 		Parse(classesInitText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.init.gen.go: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.init.gen.go: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "gdclassinit", fmt.Sprintf("classes.init.gen.go"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateCHeaderClassCallbacks(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -90,31 +77,18 @@ func GenerateCHeaderClassCallbacks(projectPath string, extensionApi extensionapi
 		}).
 		Parse(cHeaderClassesText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.callbacks.gen.h: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.callbacks.gen.h: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "gdclassinit", fmt.Sprintf("classes.callbacks.gen.h"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeGeneratedFile(filename, b.Bytes())
 }
 
 func GenerateCClassCallbacks(projectPath string, extensionApi extensionapiparser.ExtensionApi) error {
@@ -129,29 +103,28 @@ func GenerateCClassCallbacks(projectPath string, extensionApi extensionapiparser
 		}).
 		Parse(cClassesText)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse template classes.callbacks.gen.c: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	err = tmpl.Execute(&b, extensionApi)
-	if err != nil {
-		return err
+	if err := tmpl.Execute(&b, extensionApi); err != nil {
+		return fmt.Errorf("execute template classes.callbacks.gen.c: %w", err)
 	}
 
 	filename := filepath.Join(projectPath, "pkg", "gdclassinit", fmt.Sprintf("classes.callbacks.gen.c"))
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
+	return writeGeneratedFile(filename, b.Bytes())
+}
 
+func writeGeneratedFile(path string, data []byte) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("create %s: %w", path, err)
+	}
 	defer f.Close()
-
-	_, err = f.Write(b.Bytes())
-	if err != nil {
-		return err
+	if _, err := f.Write(data); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
 	}
-
 	return nil
 }

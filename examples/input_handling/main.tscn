@@ -1,0 +1,9 @@
+[gd_scene load_steps=1 format=3]
+
+[node name="Main" type="Node"]
+
+[node name="InputDemo" type="InputDemo" parent="."]
+
+[node name="Instructions" type="Label" parent="."]
+text = "Press keys or click the mouse. Output appears in the console."
+position = Vector2(16, 16)

@@ -7,6 +7,8 @@ script = ExtResource("1_c326s")
 
 [node name="Example" type="Example" parent="."]
 
+[node name="PhysicsValidation" type="PhysicsValidation" parent="."]
+
 [node name="Label" type="Label" parent="Example"]
 layout_mode = 0
 offset_left = 194.0

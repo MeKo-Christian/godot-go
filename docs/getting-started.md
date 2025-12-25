@@ -33,6 +33,24 @@ GODOT=/path/to/godot just ci_gen_test_project_files
 GODOT=/path/to/godot just test
 ```
 
+## Running the examples
+
+Standalone demo projects live under `examples/`. Build the shared library for the specific example and run Godot with the example path.
+
+```bash
+# Example: Hello World
+CGO_ENABLED=1 \
+GOOS=$(go env GOOS) \
+GOARCH=$(go env GOARCH) \
+go build -buildmode=c-shared -tags tools -trimpath \
+  -o examples/hello_world/lib/libgodotgo-hello-world-$(go env GOOS)-$(go env GOARCH).so \
+  examples/hello_world/main.go
+
+GODOT=/path/to/godot $GODOT --path examples/hello_world/
+```
+
+On macOS/Windows, match the output filename to the `.gdextension` entry for that example.
+
 ## Creating your own extension
 
 The shortest path is to copy the demo layout and adjust names.
