@@ -9,9 +9,14 @@ class TestClass:
 func _ready():
 	var example: Example = $Example
 	var physics: PhysicsValidation = $PhysicsValidation
+	var physics_bench: PhysicsBenchmark = $PhysicsBenchmark
 	var input_probe: InputProbe = $InputProbe
 	if OS.has_environment("GODOT_GO_LEAK_TEST"):
 		await run_leak_test(example)
+		exit_with_status()
+		return
+	if OS.has_environment("GODOT_GO_PHYSICS_BENCH"):
+		await run_physics_benchmark(physics_bench)
 		exit_with_status()
 		return
 	test_suite(1, example)
@@ -54,6 +59,41 @@ func get_env_int(name: String, default_value: int) -> int:
 		if raw != "":
 			return int(raw)
 	return default_value
+
+func get_env_float(name: String, default_value: float) -> float:
+	if OS.has_environment(name):
+		var raw := OS.get_environment(name)
+		if raw != "":
+			return float(raw)
+	return default_value
+
+func run_physics_benchmark(bench: PhysicsBenchmark) -> void:
+	var count := get_env_int("GODOT_GO_PHYSICS_BENCH_COUNT", 1000)
+	var steps := get_env_int("GODOT_GO_PHYSICS_BENCH_STEPS", 300)
+	var radius := get_env_float("GODOT_GO_PHYSICS_BENCH_RADIUS", 6.0)
+	var spacing := get_env_float("GODOT_GO_PHYSICS_BENCH_SPACING", 14.0)
+	var impulse := get_env_float("GODOT_GO_PHYSICS_BENCH_IMPULSE", 12.0)
+
+	print("physics benchmark: count=%s steps=%s radius=%s spacing=%s impulse=%s" % [
+		count, steps, radius, spacing, impulse
+	])
+
+	var ok := bench.setup(count, radius, spacing)
+	assert_true(ok)
+	await get_tree().physics_frame
+
+	var start_us := Time.get_ticks_usec()
+	for i in range(steps):
+		bench.apply_impulse_batch(Vector2(impulse, 0))
+		await get_tree().physics_frame
+	var end_us := Time.get_ticks_usec()
+
+	var total_ms := float(end_us - start_us) / 1000.0
+	var avg_ms := total_ms / max(steps, 1)
+	print("physics benchmark total_ms=%s avg_ms=%s bodies=%s" % [
+		total_ms, avg_ms, bench.get_body_count()
+	])
+	bench.clear_bodies()
 
 func test_suite(i: int, example: Example):
 	print("test suite run %d" % [i])

@@ -185,11 +185,11 @@ Global `runtime.Pinner` objects are never unpinned:
 
 > **Priority:** Medium — for shipping games
 
-- [ ] **Task 5.1: Performance**
-  - [ ] Profile cgo overhead in hot loops
-  - [ ] Identify and document performance-critical patterns
-  - [ ] Add object pooling utilities for common types
-  - [ ] Benchmark physics-heavy scenarios
+- [x] **Task 5.1: Performance**
+  - [x] Profile cgo overhead in hot loops
+  - [x] Identify and document performance-critical patterns
+  - [x] Add object pooling utilities for common types
+  - [x] Benchmark physics-heavy scenarios
 
 - [ ] **Task 5.2: Testing infrastructure**
   - [ ] Add unit tests for all builtin types

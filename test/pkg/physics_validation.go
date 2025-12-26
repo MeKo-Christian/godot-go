@@ -30,8 +30,8 @@ func (p *PhysicsValidation) EnableCCD(body RigidBody2D) bool {
 		log.Warn("EnableCCD called with nil body")
 		return false
 	}
-	body.SetContinuousCollisionDetectionMode(RigidBody2DCCDModeContinuous)
-	return body.GetContinuousCollisionDetectionMode() == RigidBody2DCCDModeContinuous
+	body.SetContinuousCollisionDetectionMode(RIGID_BODY_2_D_CCD_MODE_CCD_MODE_CAST_SHAPE)
+	return body.GetContinuousCollisionDetectionMode() == RIGID_BODY_2_D_CCD_MODE_CCD_MODE_CAST_SHAPE
 }
 
 func (p *PhysicsValidation) ApplyFlipperImpulse(body RigidBody2D, impulse Vector2, position Vector2) {

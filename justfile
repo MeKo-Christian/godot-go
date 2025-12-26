@@ -184,7 +184,7 @@ ci_gen_test_project_files:
     fi
 
 # Run tests in headless mode
-test:
+test: build
     CI=1 \
     LOG_LEVEL=info \
     GOTRACEBACK=single \
@@ -192,7 +192,7 @@ test:
     "{{ GODOT }}" --headless --verbose --path test/demo/ --quit
 
 # Run leak test in headless mode (configurable via env vars)
-leak_test:
+leak_test: build
     CI=1 \
     LOG_LEVEL=info \
     GOTRACEBACK=single \
@@ -206,7 +206,7 @@ leak_test:
     "{{ GODOT }}" --headless --verbose --path test/demo/ --quit
 
 # Run interactive test with debug output
-interactive_test:
+interactive_test: build
     LOG_LEVEL=info \
     GOTRACEBACK=1 \
     GODEBUG=gctrace=1,asyncpreemptoff=1,cgocheck=1,invalidptr=1,clobberfree=1,tracebackancestors=5 \

@@ -12,4 +12,5 @@ Start here:
 - Audio: `docs/audio.md`
 - Visual effects: `docs/visual_effects.md`
 - Camera & viewport: `docs/camera.md`
+- Performance: `docs/performance.md`
 - Common API reference: `docs/api_reference.md`

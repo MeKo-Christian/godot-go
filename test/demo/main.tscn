@@ -9,6 +9,8 @@ script = ExtResource("1_c326s")
 
 [node name="PhysicsValidation" type="PhysicsValidation" parent="."]
 
+[node name="PhysicsBenchmark" type="PhysicsBenchmark" parent="."]
+
 [node name="InputProbe" type="InputProbe" parent="."]
 
 [node name="Label" type="Label" parent="Example"]
