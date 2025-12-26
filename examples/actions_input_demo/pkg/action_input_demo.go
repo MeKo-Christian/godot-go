@@ -16,8 +16,8 @@ var _ GDClass = (*ActionInputDemo)(nil)
 
 type ActionInputDemo struct {
 	NodeImpl
-	score      int64
-	actionJump StringName
+	score       int64
+	actionJump  StringName
 	actionClick StringName
 	initialized bool
 }

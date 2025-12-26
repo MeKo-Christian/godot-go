@@ -26,6 +26,7 @@ GODOT=/path/to/godot $GODOT --path examples/pinball_mechanics/
 ```
 
 Controls:
+
 - Left arrow: left flipper
 - Right arrow: right flipper
 - Space: launch ball

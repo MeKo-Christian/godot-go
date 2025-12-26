@@ -64,12 +64,12 @@ func (e *Example) SimpleConstFunc(a int64) {
 	e.EmitCustomSignal("simple_const_func", 4)
 }
 
-// func (e *Example) CustomRefFunc(pRef *ExampleRef) int32 {
-// 	if pRef.IsValid() {
-// 		return pRef.Ptr().(*ExampleRef).GetId()
-// 	}
-// 	return -1
-// }
+func (e *Example) CustomRefFunc(pRef *ExampleRef) int32 {
+	if pRef == nil {
+		return -1
+	}
+	return pRef.GetId()
+}
 
 func (e *Example) ReturnSomething(base string, f32 float32, f64 float64,
 	i int, i8 int8, i16 int16, i32 int32, i64 int64,
@@ -642,7 +642,7 @@ func RegisterClassExample() {
 
 		ClassDBBindMethod(t, "SimpleFunc", "simple_func", nil, nil)
 		ClassDBBindMethod(t, "SimpleConstFunc", "simple_const_func", []string{"a"}, nil)
-		// ClassDBBindMethod(t, "CustomRefFunc", "custom_ref_func", []string{"ref"}, nil)
+		ClassDBBindMethod(t, "CustomRefFunc", "custom_ref_func", []string{"ref"}, nil)
 		ClassDBBindMethod(t, "ImageRefFunc", "image_ref_func", []string{"image"}, nil)
 		ClassDBBindMethod(t, "ReturnSomething", "return_something", []string{"base", "f32", "f64", "i", "i8", "i16", "i32", "i64"}, nil)
 		ClassDBBindMethod(t, "ReturnSomethingConst", "return_something_const", nil, nil)

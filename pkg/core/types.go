@@ -64,6 +64,10 @@ func (c *ClassInfo) Destroy() {
 		parentName.Destroy()
 	}
 
+	for i := range c.PropertyList {
+		c.PropertyList[i].Destroy()
+	}
+
 	// for _, v := range c.VirtualMethodMap {
 	// 	v.ClassMethodInfo.Destroy()
 	// }

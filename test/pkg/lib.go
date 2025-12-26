@@ -16,7 +16,7 @@ import (
 
 func RegisterExampleTypes() {
 	log.Debug("RegisterExampleTypes called")
-	// RegisterClassExampleRef()
+	RegisterClassExampleRef()
 	RegisterClassExample()
 	RegisterClassPhysicsValidation()
 	RegisterClassPhysicsBenchmark()
@@ -26,6 +26,7 @@ func RegisterExampleTypes() {
 func UnregisterExampleTypes() {
 	log.Debug("UnregisterExampleTypes called")
 	UnregisterClassExample()
+	UnregisterClassExampleRef()
 	UnregisterClassPhysicsValidation()
 	UnregisterClassPhysicsBenchmark()
 	UnregisterClassInputProbe()

@@ -127,12 +127,12 @@ func test_suite(i: int, example: Example):
 	assert_equal(custom_signal_emitted, ['simple_const_func', 4])
 
 	# Pass custom reference.
-	# assert_equal(example.custom_ref_func(null), -1)
-	# var ref1 = ExampleRef.new()
-	# ref1.id = 27
-	# assert_equal(example.custom_ref_func(ref1), 27)
-	# ref1.id += 1;
-	# assert_equal(example.custom_const_ref_func(ref1), 28)
+	assert_equal(example.custom_ref_func(null), -1)
+	var ref1 = ExampleRef.new()
+	ref1.id = 27
+	assert_equal(example.custom_ref_func(ref1), 27)
+	ref1.id += 1
+	assert_equal(example.custom_ref_func(ref1), 28)
 
 	# Pass core reference.
 	assert_equal(example.image_ref_func(null), "invalid")
@@ -153,8 +153,6 @@ func test_suite(i: int, example: Example):
 	assert_equal(example.test_node_argument(example), example)
 
 	# VarArg method calls.
-	# var var_ref = ExampleRef.new()
-	# assert_not_equal(example.extended_ref_checks(var_ref).get_instance_id(), var_ref.get_instance_id())
 	assert_equal(example.varargs_func("some", "arguments", "to", "test"), 4)
 	assert_equal(example.varargs_func("some"), 1)
 	assert_equal(example.varargs_func_nv("some", "arguments", "to", "test"), 46)
@@ -385,7 +383,6 @@ func send_key_events(keycode: Key, count: int) -> void:
 	# # Test Object::cast_to<>() and that correct wrappers are being used.
 	# var control = Control.new()
 	# var sprite = Sprite2D.new()
-	# var example_ref = ExampleRef.new()
 
 	# assert_equal(example.test_object_cast_to_node(control), true)
 	# assert_equal(example.test_object_cast_to_control(control), true)
