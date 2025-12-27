@@ -32,8 +32,9 @@ func (p *PinballGame) connectSignals() {
 		printLine("PinballGame: ScoreSystem not found")
 		return
 	}
-	scoreSystem, ok := ObjectCastTo(scoreNode, "ScoreSystem").(*ScoreSystem)
-	if !ok || scoreSystem == nil {
+	// Use getGDClassInstance instead of ObjectCastTo for custom GDExtension classes
+	scoreSystem := getGDClassInstance[*ScoreSystem](scoreNode)
+	if scoreSystem == nil {
 		printLine("PinballGame: ScoreSystem cast failed")
 		return
 	}
@@ -48,7 +49,11 @@ func (p *PinballGame) connectSignals() {
 
 	launcherNode := p.GetNodeOrNull(nodePath("BallLauncher"))
 	if launcherNode != nil {
-		connectSignalTo(ObjectCastTo(launcherNode, "BallLauncher"), drainNode, "drained", "_on_ball_drained")
+		// Use getGDClassInstance for custom GDExtension classes
+		launcher := getGDClassInstance[*BallLauncher](launcherNode)
+		if launcher != nil {
+			connectSignalTo(launcher, drainNode, "drained", "_on_ball_drained")
+		}
 	}
 }
 

@@ -371,6 +371,30 @@ func loadProcAddressName(typeName string) string {
 	return ret
 }
 
+// procAddressName maps a GDExtensionInterface typedef name (e.g.
+// GDExtensionInterfaceCallableCustomGetUserData) to the correct proc-address
+// string expected by Godot's `get_proc_address`, which uses the `@name` values
+// from `gdextension_interface.h`.
+//
+// Note: We intentionally keep `loadProcAddressName` unchanged because it is
+// also used for generating stable Go field names.
+func procAddressName(typeName string) string {
+	ret := loadProcAddressName(typeName)
+
+	// Godot uses suffix digits without underscores (e.g. class5, not class_5).
+	ret = strings.Replace(ret, "_5", "5", 1)
+	ret = strings.Replace(ret, "_6", "6", 1)
+	ret = strings.Replace(ret, "_7", "7", 1)
+	ret = strings.Replace(ret, "_8", "8", 1)
+	ret = strings.Replace(ret, "_9", "9", 1)
+
+	// Special cases where the typedef name does not match the `@name`.
+	ret = strings.Replace(ret, "callable_custom_get_user_data", "callable_custom_get_userdata", 1)
+	ret = strings.Replace(ret, "get_variant_get_internal_ptr_func", "variant_get_ptr_internal_getter", 1)
+
+	return ret
+}
+
 func trimPrefix(typeName, prefix string) string {
 	prefixLen := len(prefix)
 	if strings.HasPrefix(typeName, prefix) {

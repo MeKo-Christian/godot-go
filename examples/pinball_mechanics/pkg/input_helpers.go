@@ -5,9 +5,36 @@ import (
 
 	. "github.com/godot-go/godot-go/pkg/builtin"
 	. "github.com/godot-go/godot-go/pkg/constant"
+	. "github.com/godot-go/godot-go/pkg/core"
+	. "github.com/godot-go/godot-go/pkg/ffi"
 	. "github.com/godot-go/godot-go/pkg/gdclassimpl"
 	. "github.com/godot-go/godot-go/pkg/gdutilfunc"
 )
+
+// getGDClassInstance looks up a custom GDExtension class instance by its Object.
+// This is needed because ObjectCastTo doesn't work for custom GDExtension classes.
+func getGDClassInstance[T GDClass](obj Object) T {
+	var zero T
+	if obj == nil {
+		return zero
+	}
+	owner := obj.GetGodotObjectOwner()
+	if owner == nil {
+		return zero
+	}
+	id := CallFunc_GDExtensionInterfaceObjectGetInstanceId(
+		(GDExtensionConstObjectPtr)(unsafe.Pointer(owner)),
+	)
+	inst, ok := Internal.GDClassInstances.Get(id)
+	if !ok {
+		return zero
+	}
+	result, ok := inst.(T)
+	if !ok {
+		return zero
+	}
+	return result
+}
 
 const (
 	actionLeftFlipper  = "pinball_left_flipper"
@@ -64,11 +91,15 @@ func newInputEventKey(key Key) InputEventKey {
 	className := NewStringNameWithLatin1Chars("InputEventKey")
 	defer className.Destroy()
 	v := classDB.Instantiate(className)
-	defer v.Destroy()
+	// NOTE: Do NOT call v.Destroy() here!
+	// InputEventKey is a RefCounted object. When the Variant is destroyed,
+	// it decrements the refcount. Since we're extracting the object to keep it,
+	// destroying the Variant would free the object (dropping refcount from 1 to 0).
 	obj := v.ToObject()
 	keyEvent, ok := ObjectCastTo(obj, "InputEventKey").(InputEventKey)
 	if !ok || keyEvent == nil {
 		printLine("PinballGame: failed to create InputEventKey")
+		v.Destroy() // Safe to destroy here since we're not keeping the object
 		return nil
 	}
 	keyEvent.SetKeycode(key)

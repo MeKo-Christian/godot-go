@@ -128,6 +128,7 @@ func GenerateGDExtensionInterfaceGoFile(projectPath string, ast clang.CHeaderFil
 		"cgoCleanUpArgument":  cgoCleanUpArgument,
 		"trimPrefix":          trimPrefix,
 		"loadProcAddressName": loadProcAddressName,
+		"procAddressName":     procAddressName,
 	}
 
 	tmpl, err := template.New("ffi.gen.go").
