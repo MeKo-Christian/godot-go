@@ -89,6 +89,10 @@ func (m *GDExtensionClassMethodInfo) Destroy() {
 		(*GDExtensionPropertyInfo)(cm.return_value_info).Destroy()
 	}
 	if cm.argument_count > 0 && cm.arguments_info != nil {
-		(*GDExtensionPropertyInfo)(cm.arguments_info).Destroy()
+		argSlice := unsafe.Slice(cm.arguments_info, cm.argument_count)
+		for i := range argSlice {
+			entry := (*GDExtensionPropertyInfo)(unsafe.Pointer(&argSlice[i]))
+			entry.Destroy()
+		}
 	}
 }

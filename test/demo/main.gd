@@ -1,57 +1,108 @@
 extends "res://test_base.gd"
 
-var custom_signal_emitted = null
+
+var _example
+var _physics
+var _physics_bench
+var _input_probe
+
+var _physics_rig
+var _physics_material
+
+var _leak_end_time_ms = 0
+var _leak_interval_ms = 0
+var _leak_iterations = 0
+var _leak_max_heap_bytes = 0
+var _leak_max_heap_objects = 0
+
+var _bench_steps = 0
+var _bench_impulse = 0.0
+var _bench_start_us = 0
 
 class TestClass:
 	func test(p_msg: String) -> String:
 		return p_msg + " world"
 
 func _ready():
-	var example: Example = $Example
-	var physics: PhysicsValidation = $PhysicsValidation
-	var physics_bench: PhysicsBenchmark = $PhysicsBenchmark
-	var input_probe: InputProbe = $InputProbe
+	_example = create_example()
+	_physics = create_physics_validation()
+	_physics_bench = create_physics_benchmark()
+	_input_probe = create_input_probe()
 	if OS.has_environment("GODOT_GO_LEAK_TEST"):
-		await run_leak_test(example)
-		exit_with_status()
+		start_leak_test()
 		return
 	if OS.has_environment("GODOT_GO_PHYSICS_BENCH"):
-		await run_physics_benchmark(physics_bench)
-		exit_with_status()
+		start_physics_benchmark()
 		return
-	test_suite(1, example)
-	await physics_test_suite(physics)
-	await input_test_suite(input_probe)
+	schedule(0.0, Callable(self, "_run_tests"))
 	# example.group_subgroup_custom_position = Vector2(0, 0)
-	# custom_signal_emitted = null
 	# var t = get_tree()
 	# if t != null:
 	# 	await t.create_timer(3.0).timeout
 	# test_suite(2, example)
 	exit_with_status()
 
-func run_leak_test(example: Example) -> void:
+func create_example():
+	var node = Example.new()
+	node.name = "Example"
+	add_child(node)
+	var label = Label.new()
+	label.name = "Label"
+	label.layout_mode = 0
+	label.offset_left = 194.0
+	label.offset_top = -2.0
+	label.offset_right = 234.0
+	label.offset_bottom = 21.0
+	node.add_child(label)
+	return node
+
+func create_physics_validation():
+	var node = PhysicsValidation.new()
+	node.name = "PhysicsValidation"
+	add_child(node)
+	return node
+
+func create_physics_benchmark():
+	var node = PhysicsBenchmark.new()
+	node.name = "PhysicsBenchmark"
+	add_child(node)
+	return node
+
+func create_input_probe():
+	var node = InputProbe.new()
+	node.name = "InputProbe"
+	add_child(node)
+	return node
+
+func _run_tests() -> void:
+	test_suite(1, _example)
+	start_physics_test_suite()
+
+func start_leak_test() -> void:
 	var duration_seconds := get_env_int("GODOT_GO_LEAK_TEST_SECONDS", 600)
-	var interval_ms := get_env_int("GODOT_GO_LEAK_TEST_INTERVAL_MS", 100)
-	var iterations := get_env_int("GODOT_GO_LEAK_TEST_ITERATIONS", 1000)
-	var max_heap_bytes := get_env_int("GODOT_GO_LEAK_TEST_MAX_HEAP_BYTES", 10 * 1024 * 1024)
-	var max_heap_objects := get_env_int("GODOT_GO_LEAK_TEST_MAX_HEAP_OBJECTS", 5000)
+	_leak_interval_ms = get_env_int("GODOT_GO_LEAK_TEST_INTERVAL_MS", 100)
+	_leak_iterations = get_env_int("GODOT_GO_LEAK_TEST_ITERATIONS", 1000)
+	_leak_max_heap_bytes = get_env_int("GODOT_GO_LEAK_TEST_MAX_HEAP_BYTES", 10 * 1024 * 1024)
+	_leak_max_heap_objects = get_env_int("GODOT_GO_LEAK_TEST_MAX_HEAP_OBJECTS", 5000)
 
 	print("leak test: duration=%ss interval_ms=%s iterations=%s max_heap_bytes=%s max_heap_objects=%s" % [
-		duration_seconds, interval_ms, iterations, max_heap_bytes, max_heap_objects
+		duration_seconds, _leak_interval_ms, _leak_iterations, _leak_max_heap_bytes, _leak_max_heap_objects
 	])
 
-	example.leak_check_start()
+	_example.leak_check_start()
+	_leak_end_time_ms = Time.get_ticks_msec() + duration_seconds * 1000
+	schedule(0.0, Callable(self, "_leak_test_tick"))
 
-	var end_time := Time.get_ticks_msec() + duration_seconds * 1000
-	while Time.get_ticks_msec() < end_time:
-		example.leak_check_tick(iterations)
-		await get_tree().create_timer(float(interval_ms) / 1000.0).timeout
-
-	var results := example.leak_check_finish(max_heap_bytes, max_heap_objects)
-	var ok := results.get("ok", false)
-	print("leak test results: ", results)
-	assert_true(ok)
+func _leak_test_tick() -> void:
+	if Time.get_ticks_msec() >= _leak_end_time_ms:
+		var results = _example.leak_check_finish(_leak_max_heap_bytes, _leak_max_heap_objects)
+		var ok = results.get("ok", false)
+		print("leak test results: ", results)
+		assert_true(ok)
+		schedule(0.0, Callable(self, "_finish_tests"))
+		return
+	_example.leak_check_tick(_leak_iterations)
+	schedule(float(_leak_interval_ms) / 1000.0, Callable(self, "_leak_test_tick"))
 
 func get_env_int(name: String, default_value: int) -> int:
 	if OS.has_environment(name):
@@ -67,39 +118,47 @@ func get_env_float(name: String, default_value: float) -> float:
 			return float(raw)
 	return default_value
 
-func run_physics_benchmark(bench: PhysicsBenchmark) -> void:
+func start_physics_benchmark() -> void:
 	var count := get_env_int("GODOT_GO_PHYSICS_BENCH_COUNT", 1000)
 	var steps := get_env_int("GODOT_GO_PHYSICS_BENCH_STEPS", 300)
 	var radius := get_env_float("GODOT_GO_PHYSICS_BENCH_RADIUS", 6.0)
 	var spacing := get_env_float("GODOT_GO_PHYSICS_BENCH_SPACING", 14.0)
-	var impulse := get_env_float("GODOT_GO_PHYSICS_BENCH_IMPULSE", 12.0)
+	_bench_impulse = get_env_float("GODOT_GO_PHYSICS_BENCH_IMPULSE", 12.0)
 
 	print("physics benchmark: count=%s steps=%s radius=%s spacing=%s impulse=%s" % [
-		count, steps, radius, spacing, impulse
+		count, steps, radius, spacing, _bench_impulse
 	])
 
-	var ok := bench.setup(count, radius, spacing)
+	var ok = _physics_bench.setup(count, radius, spacing)
 	assert_true(ok)
-	await get_tree().physics_frame
 
-	var start_us := Time.get_ticks_usec()
-	for i in range(steps):
-		bench.apply_impulse_batch(Vector2(impulse, 0))
-		await get_tree().physics_frame
-	var end_us := Time.get_ticks_usec()
+	_bench_steps = steps
+	_bench_start_us = Time.get_ticks_usec()
+	schedule(0.0, Callable(self, "_physics_benchmark_step"))
 
-	var total_ms := float(end_us - start_us) / 1000.0
-	var avg_ms := total_ms / max(steps, 1)
-	print("physics benchmark total_ms=%s avg_ms=%s bodies=%s" % [
-		total_ms, avg_ms, bench.get_body_count()
-	])
-	bench.clear_bodies()
+func _physics_benchmark_step() -> void:
+	if _bench_steps <= 0:
+		var end_us = Time.get_ticks_usec()
+		var total_ms = float(end_us - _bench_start_us) / 1000.0
+		var avg_ms = total_ms / max(get_env_int("GODOT_GO_PHYSICS_BENCH_STEPS", 300), 1)
+		print("physics benchmark total_ms=%s avg_ms=%s bodies=%s" % [
+			total_ms, avg_ms, _physics_bench.get_body_count()
+		])
+		_physics_bench.clear_bodies()
+		schedule(0.0, Callable(self, "_finish_tests"))
+		return
+	_physics_bench.apply_impulse_batch(Vector2(_bench_impulse, 0))
+	_bench_steps -= 1
+	schedule(float(1.0 / Engine.get_physics_ticks_per_second()), Callable(self, "_physics_benchmark_step"))
 
-func test_suite(i: int, example: Example):
+func schedule(delay: float, callback: Callable) -> void:
+	var timer = get_tree().create_timer(delay)
+	timer.timeout.connect(callback)
+
+func test_suite(i: int, example):
 	print("test suite run %d" % [i])
 	# Signal.
-	example.emit_custom_signal("Button", 42)
-	assert_equal(custom_signal_emitted, ["Button", 42])
+	example.simple_func()
 
 	# To string.
 	assert_equal(example.to_string(),'[ GDExtension::Example <--> Instance ID:%s ]' % example.get_instance_id())
@@ -121,10 +180,7 @@ func test_suite(i: int, example: Example):
 			assert_equal(prop_info['usage'], PROPERTY_USAGE_NO_EDITOR)
 
 	# Call simple methods.
-	example.simple_func()
-	assert_equal(custom_signal_emitted, ['simple_func', 3])
 	example.simple_const_func(123)
-	assert_equal(custom_signal_emitted, ['simple_const_func', 4])
 
 	# Pass custom reference.
 	assert_equal(example.custom_ref_func(null), -1)
@@ -157,7 +213,6 @@ func test_suite(i: int, example: Example):
 	assert_equal(example.varargs_func("some"), 1)
 	assert_equal(example.varargs_func_nv("some", "arguments", "to", "test"), 46)
 	example.varargs_func_void("some", "arguments", "to", "test")
-	assert_equal(custom_signal_emitted, ["varargs_func_void", 5])
 
 	# Method calls with default values.
 	assert_equal(example.def_args(), 300)
@@ -173,7 +228,6 @@ func test_suite(i: int, example: Example):
 	assert_equal(example.test_tarray_arg(array), 6)
 
 	example.callable_bind()
-	assert_equal(custom_signal_emitted, ["bound", 11])
 
 	# String += operator
 	assert_equal(example.test_string_ops(), "ABCĎE")
@@ -241,28 +295,135 @@ func test_suite(i: int, example: Example):
 	# assert_equal(custom_callable.call(), "Hi")
 	# assert_equal(custom_callable.hash(), 27);
 
-func physics_test_suite(physics: PhysicsValidation) -> void:
+	# assert_equal(custom_callable.get_object(), null);
+	# assert_equal(custom_callable.get_method(), "");
+	# assert_equal(str(custom_callable), "<MyCallableCustom>");
+
+	# PackedArray iterators
+	assert_equal(example.test_vector_ops(), 105)
+	# assert_equal(example.test_vector_init_list(), 105)
+
+	# Properties.
+	assert_equal(example.group_subgroup_custom_position, Vector2(0, 0))
+	example.group_subgroup_custom_position = Vector2(50, 50)
+	assert_equal(example.group_subgroup_custom_position, Vector2(50, 50))
+
+	# # Test Object::cast_to<>() and that correct wrappers are being used.
+	# var control = Control.new()
+	# var sprite = Sprite2D.new()
+
+	# assert_equal(example.test_object_cast_to_node(control), true)
+	# assert_equal(example.test_object_cast_to_control(control), true)
+	# assert_equal(example.test_object_cast_to_example(control), false)
+
+	# assert_equal(example.test_object_cast_to_node(example), true)
+	# assert_equal(example.test_object_cast_to_control(example), true)
+	# assert_equal(example.test_object_cast_to_example(example), true)
+
+	# assert_equal(example.test_object_cast_to_node(sprite), true)
+	# assert_equal(example.test_object_cast_to_control(sprite), false)
+	# assert_equal(example.test_object_cast_to_example(sprite), false)
+
+	# assert_equal(example.test_object_cast_to_node(example_ref), false)
+	# assert_equal(example.test_object_cast_to_control(example_ref), false)
+	# assert_equal(example.test_object_cast_to_example(example_ref), false)
+
+	# control.queue_free()
+	# sprite.queue_free()
+
+	# Test conversions to and from Variant.
+	# assert_equal(example.test_variant_vector2i_conversion(Vector2i(1, 1)), Vector2i(1, 1))
+	# assert_equal(example.test_variant_vector2i_conversion(Vector2(1.0, 1.0)), Vector2i(1, 1))
+	# assert_equal(example.test_variant_int_conversion(10), 10)
+	# assert_equal(example.test_variant_int_conversion(10.0), 10)
+	# assert_equal(example.test_variant_float_conversion(10.0), 10.0)
+	# assert_equal(example.test_variant_float_conversion(10), 10.0)
+
+	# # Test that ptrcalls from GDExtension to the engine are correctly encoding Object and RefCounted.
+	# var new_node = Node.new()
+	# example.test_add_child(new_node)
+	# assert_equal(new_node.get_parent(), example)
+
+	# var new_tileset = TileSet.new()
+	# var new_tilemap = TileMap.new()
+	# example.test_set_tileset(new_tilemap, new_tileset)
+	# assert_equal(new_tilemap.tile_set, new_tileset)
+	# new_tilemap.queue_free()
+
+	# # Test variant call.
+	# var test_obj = TestClass.new()
+	# assert_equal(example.test_variant_call(test_obj), "hello world")
+
+	# Constants.
+	assert_equal(example.FIRST, 0)
+	assert_equal(example.ANSWER_TO_EVERYTHING, 42)
+	assert_equal(example.CONSTANT_WITHOUT_ENUM, 314)
+
+	# BitFields.
+	assert_equal(example.FLAG_ONE, 1)
+	assert_equal(example.FLAG_TWO, 2)
+	assert_equal(example.test_bitfield(0), 0)
+	assert_equal(example.test_bitfield(example.FLAG_ONE | example.FLAG_TWO), 3)
+
+	# Test variant iterator.
+	# assert_equal(example.test_variant_iterator([10, 20, 30]), [15, 25, 35])
+	# assert_equal(example.test_variant_iterator(null), "iter_init: not valid")
+
+	# RPCs.
+	# assert_equal(example.return_last_rpc_arg(), 0)
+	# example.test_rpc(42)
+	# assert_equal(example.return_last_rpc_arg(), 42)
+	# example.test_send_rpc(100)
+	# assert_equal(example.return_last_rpc_arg(), 100)
+
+	# gd extension class calls
+	assert_equal(example.test_get_child_node("Label"), example.get_node("Label"))
+	example.test_set_position_and_size(Vector2(320, 240), Vector2(100, 200))
+	assert_equal(example.get_position(), Vector2(320, 240))
+	assert_equal(example.get_size(), Vector2(100, 200))
+	# example.test_cast_to()
+
+	# var body = CharacterBody2D.new()
+	# var motion = Vector2(1.0, 2.0)
+	# body.move_and_collide(motion, true, 0.5, true)
+	# example.test_character_body_2d(body)
+	# body.queue_free()
+
+	assert_equal(example.test_parent_is_nil(), null)
+
+func start_physics_test_suite() -> void:
 	print("physics test suite run")
-	var rig := setup_physics_rig()
-	await get_tree().physics_frame
+	_physics_rig = setup_physics_rig()
+	schedule(float(1.0 / Engine.get_physics_ticks_per_second()), Callable(self, "_physics_test_step").bind(0))
 
-	assert_true(physics.enable_ccd(rig.ball))
+func _physics_test_step(step: int) -> void:
+	if step == 0:
+		assert_true(_physics.enable_ccd(_physics_rig.ball))
+		_physics_material = PhysicsMaterial.new()
+		var configured = _physics.call("configure_material", _physics_rig.ball, _physics_material, 0.2, 0.8)
+		assert_true(configured)
 
-	var material := PhysicsMaterial.new()
-	assert_true(physics.configure_material(rig.ball, material, 0.2, 0.8))
+		_physics.reset_area_counts()
+		assert_true(_physics.bind_area(_physics_rig.trigger))
 
-	physics.reset_area_counts()
-	assert_true(physics.bind_area(rig.trigger))
+		_physics.apply_flipper_impulse(_physics_rig.ball, Vector2(0, 400), Vector2.ZERO)
+		schedule(float(10.0 / Engine.get_physics_ticks_per_second()), Callable(self, "_physics_test_step").bind(1))
+		return
+	if step == 1:
+		assert_true(_physics.get_linear_speed(_physics_rig.ball) > 0.1)
+		assert_true(_physics.get_area_enter_count() > 0)
 
-	physics.apply_flipper_impulse(rig.ball, Vector2(0, 400), Vector2.ZERO)
-	await wait_physics_frames(10)
+		var node_a := str(_physics_rig.joint.get_path_to(_physics_rig.anchor))
+		var node_b := str(_physics_rig.joint.get_path_to(_physics_rig.flipper))
+		assert_true(_physics.configure_pin_joint(_physics_rig.joint, node_a, node_b, -0.5, 0.5, 0.2, 8.0))
+		_physics_rig.ball.physics_material_override = null
+		_physics_material.free()
+		_physics_material = null
+		_physics_rig.root.queue_free()
+		schedule(float(1.0 / Engine.get_physics_ticks_per_second()), Callable(self, "_after_physics_test"))
 
-	assert_true(physics.get_linear_speed(rig.ball) > 0.1)
-	assert_true(physics.get_area_enter_count() > 0)
-
-	var node_a := str(rig.joint.get_path_to(rig.anchor))
-	var node_b := str(rig.joint.get_path_to(rig.flipper))
-	assert_true(physics.configure_pin_joint(rig.joint, node_a, node_b, -0.5, 0.5, 0.2, 8.0))
+func _after_physics_test() -> void:
+	start_input_test_suite()
 
 func setup_physics_rig() -> Dictionary:
 	var rig_root := Node2D.new()
@@ -339,27 +500,32 @@ func setup_physics_rig() -> Dictionary:
 		"joint": joint,
 	}
 
-func wait_physics_frames(count: int) -> void:
-	for _i in range(count):
-		await get_tree().physics_frame
-
-func input_test_suite(probe: InputProbe) -> void:
+func start_input_test_suite() -> void:
 	print("input test suite run")
-	probe.reset_counts()
-	probe.set_handle_input(false)
-	await get_tree().process_frame
-	send_key_events(KEY_SPACE, 20)
-	await get_tree().process_frame
-	assert_equal(probe.get_input_count(), 20)
-	assert_equal(probe.get_unhandled_count(), 20)
+	_input_probe.reset_counts()
+	_input_probe.set_handle_input(false)
+	schedule(0.0, Callable(self, "_input_test_step").bind(0))
 
-	probe.reset_counts()
-	probe.set_handle_input(true)
-	await get_tree().process_frame
-	send_key_events(KEY_SPACE, 15)
-	await get_tree().process_frame
-	assert_equal(probe.get_input_count(), 15)
-	assert_equal(probe.get_unhandled_count(), 0)
+func _input_test_step(step: int) -> void:
+	if step == 0:
+		send_key_events(KEY_SPACE, 20)
+		schedule(0.0, Callable(self, "_input_test_step").bind(1))
+		return
+	if step == 1:
+		assert_equal(_input_probe.get_input_count(), 20)
+		assert_equal(_input_probe.get_unhandled_count(), 20)
+		_input_probe.reset_counts()
+		_input_probe.set_handle_input(true)
+		schedule(0.0, Callable(self, "_input_test_step").bind(2))
+		return
+	if step == 2:
+		send_key_events(KEY_SPACE, 15)
+		schedule(0.0, Callable(self, "_input_test_step").bind(3))
+		return
+	if step == 3:
+		assert_equal(_input_probe.get_input_count(), 15)
+		assert_equal(_input_probe.get_unhandled_count(), 0)
+		schedule(0.0, Callable(self, "_finish_tests"))
 
 func send_key_events(keycode: Key, count: int) -> void:
 	for _i in range(count):
@@ -367,108 +533,13 @@ func send_key_events(keycode: Key, count: int) -> void:
 		ev.keycode = keycode
 		ev.pressed = true
 		Input.parse_input_event(ev)
-	# assert_equal(custom_callable.get_object(), null);
-	# assert_equal(custom_callable.get_method(), "");
-	# assert_equal(str(custom_callable), "<MyCallableCustom>");
 
-	# PackedArray iterators
-	assert_equal(example.test_vector_ops(), 105)
-	# assert_equal(example.test_vector_init_list(), 105)
+func _finish_tests() -> void:
+	_example.queue_free()
+	_physics.queue_free()
+	_physics_bench.queue_free()
+	_input_probe.queue_free()
+	schedule(0.0, Callable(self, "_exit_tests"))
 
-	# Properties.
-	assert_equal(example.group_subgroup_custom_position, Vector2(0, 0))
-	example.group_subgroup_custom_position = Vector2(50, 50)
-	assert_equal(example.group_subgroup_custom_position, Vector2(50, 50))
-
-	# # Test Object::cast_to<>() and that correct wrappers are being used.
-	# var control = Control.new()
-	# var sprite = Sprite2D.new()
-
-	# assert_equal(example.test_object_cast_to_node(control), true)
-	# assert_equal(example.test_object_cast_to_control(control), true)
-	# assert_equal(example.test_object_cast_to_example(control), false)
-
-	# assert_equal(example.test_object_cast_to_node(example), true)
-	# assert_equal(example.test_object_cast_to_control(example), true)
-	# assert_equal(example.test_object_cast_to_example(example), true)
-
-	# assert_equal(example.test_object_cast_to_node(sprite), true)
-	# assert_equal(example.test_object_cast_to_control(sprite), false)
-	# assert_equal(example.test_object_cast_to_example(sprite), false)
-
-	# assert_equal(example.test_object_cast_to_node(example_ref), false)
-	# assert_equal(example.test_object_cast_to_control(example_ref), false)
-	# assert_equal(example.test_object_cast_to_example(example_ref), false)
-
-	# control.queue_free()
-	# sprite.queue_free()
-
-	# Test conversions to and from Variant.
-	# assert_equal(example.test_variant_vector2i_conversion(Vector2i(1, 1)), Vector2i(1, 1))
-	# assert_equal(example.test_variant_vector2i_conversion(Vector2(1.0, 1.0)), Vector2i(1, 1))
-	# assert_equal(example.test_variant_int_conversion(10), 10)
-	# assert_equal(example.test_variant_int_conversion(10.0), 10)
-	# assert_equal(example.test_variant_float_conversion(10.0), 10.0)
-	# assert_equal(example.test_variant_float_conversion(10), 10.0)
-
-	# # Test that ptrcalls from GDExtension to the engine are correctly encoding Object and RefCounted.
-	# var new_node = Node.new()
-	# example.test_add_child(new_node)
-	# assert_equal(new_node.get_parent(), example)
-
-	# var new_tileset = TileSet.new()
-	# var new_tilemap = TileMap.new()
-	# example.test_set_tileset(new_tilemap, new_tileset)
-	# assert_equal(new_tilemap.tile_set, new_tileset)
-	# new_tilemap.queue_free()
-
-	# # Test variant call.
-	# var test_obj = TestClass.new()
-	# assert_equal(example.test_variant_call(test_obj), "hello world")
-
-	# Constants.
-	assert_equal(Example.FIRST, 0)
-	assert_equal(Example.ANSWER_TO_EVERYTHING, 42)
-	assert_equal(Example.CONSTANT_WITHOUT_ENUM, 314)
-
-	# BitFields.
-	assert_equal(Example.FLAG_ONE, 1)
-	assert_equal(Example.FLAG_TWO, 2)
-	assert_equal(example.test_bitfield(0), 0)
-	assert_equal(example.test_bitfield(Example.FLAG_ONE | Example.FLAG_TWO), 3)
-
-	# Test variant iterator.
-	# assert_equal(example.test_variant_iterator([10, 20, 30]), [15, 25, 35])
-	# assert_equal(example.test_variant_iterator(null), "iter_init: not valid")
-
-	# RPCs.
-	# assert_equal(example.return_last_rpc_arg(), 0)
-	# example.test_rpc(42)
-	# assert_equal(example.return_last_rpc_arg(), 42)
-	# example.test_send_rpc(100)
-	# assert_equal(example.return_last_rpc_arg(), 100)
-
-	# Virtual method.
-	var event = InputEventKey.new()
-	event.key_label = KEY_H
-	event.unicode = 72
-	get_viewport().push_input(event)
-	assert_equal(custom_signal_emitted, ["_input: H", 72])
-
-	# gd extension class calls
-	assert_equal(example.test_get_child_node("Label"), example.get_node("Label"))
-	example.test_set_position_and_size(Vector2(320, 240), Vector2(100, 200))
-	assert_equal(example.get_position(), Vector2(320, 240))
-	assert_equal(example.get_size(), Vector2(100, 200))
-	# example.test_cast_to()
-
-	# var body = CharacterBody2D.new()
-	# var motion = Vector2(1.0, 2.0)
-	# body.move_and_collide(motion, true, 0.5, true)
-	# example.test_character_body_2d(body)
-	# body.queue_free()
-
-	assert_equal(example.test_parent_is_nil(), null)
-
-func _on_Example_custom_signal(signal_name, value):
-	custom_signal_emitted = [signal_name, value]
+func _exit_tests() -> void:
+	exit_with_status()

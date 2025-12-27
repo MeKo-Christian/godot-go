@@ -30,6 +30,58 @@ var (
 	refType              = reflect.TypeOf((*Ref)(nil)).Elem()
 )
 
+func refValueFromVariant(arg Variant, expectedType reflect.Type) (reflect.Value, bool) {
+	if arg.IsNil() {
+		return reflect.Zero(expectedType), true
+	}
+	owner := arg.ToObjectPtr()
+	if owner == nil {
+		return reflect.Zero(expectedType), true
+	}
+	snClassName := StringName{}
+	snClassNamePtr := snClassName.NativePtr()
+	pnr.Pin(snClassNamePtr)
+	cok := CallFunc_GDExtensionInterfaceObjectGetClassName(
+		(GDExtensionConstObjectPtr)(owner),
+		FFI.Library,
+		(GDExtensionUninitializedStringNamePtr)(snClassNamePtr),
+	)
+	if cok == 0 {
+		log.Panic("failed to get class name for ref",
+			zap.Any("owner", owner),
+		)
+	}
+	className := snClassName.ToUtf8()
+	snClassName.Destroy()
+	constructor, ok := GDNativeConstructors.Get(className)
+	if !ok {
+		log.Panic("unable to find constructor for ref",
+			zap.String("class_name", className),
+		)
+	}
+	inst := constructor(owner).(RefCounted)
+	refConstructor, ok := GDClassRefConstructors.Get(className)
+	if !ok {
+		log.Panic("unable to find ref constructor",
+			zap.String("class_name", className),
+		)
+	}
+	ref := refConstructor(inst)
+	refValue := reflect.ValueOf(ref)
+	if refValue.Type().AssignableTo(expectedType) {
+		return refValue, true
+	}
+	if refValue.Type().ConvertibleTo(expectedType) {
+		return refValue.Convert(expectedType), true
+	}
+	log.Panic("ref type mismatch",
+		zap.String("class_name", className),
+		zap.Any("expected", expectedType),
+		zap.Any("actual", refValue.Type()),
+	)
+	return reflect.Zero(expectedType), true
+}
+
 // reflectFuncCallArgsFromGDExtensionConstVariantPtrSliceArgs is called for each
 // function call argument that needs to be translated when GDScript calls into Go.
 func reflectFuncCallArgsFromGDExtensionConstVariantPtrSliceArgs(reciever GDClass, suppliedArgs []Variant, expectedArgTypes []reflect.Type) []reflect.Value {
@@ -165,23 +217,14 @@ func convertVariantToGoTypeReflectValue(arg Variant, t reflect.Type) (reflect.Va
 	case reflect.Interface:
 		switch {
 		case t.Implements(refType):
-			obj := arg.ToObject()
-			log.Debug("ptrcall arg parsed",
-				zap.String("value", arg.Stringify()),
+			refValue, ok := refValueFromVariant(arg, t)
+			if ok {
+				return refValue, nil
+			}
+			log.Panic("failed to parse ref argument",
 				zap.String("type", t.Name()),
 			)
-			refTypeName := t.Name()
-			constructor, ok := GDClassRefConstructors.Get(refTypeName[3:])
-			if !ok {
-				log.Fatal("unable to get ref constructor",
-					zap.String("type", t.Name()),
-				)
-			}
-			if obj == nil {
-				return reflect.Zero(t), nil
-			}
-			ref := constructor(obj.(RefCounted))
-			return reflect.ValueOf(ref), nil
+			return reflect.Zero(t), nil
 		case t.Implements(gdObjectType):
 			if arg.IsNil() {
 				return reflect.Zero(t), nil
@@ -291,18 +334,14 @@ func convertVariantToGoTypeReflectValue(arg Variant, t reflect.Type) (reflect.Va
 	case reflect.Pointer:
 		switch {
 		case t.Implements(refType):
-			// TODO: is this coming out as a Ref type here?
-			obj := arg.ToObject()
-			ref, ok := obj.(Ref)
-			if !ok {
-				log.Panic("not a ref instance",
-					zap.String("value", arg.Stringify()),
-				)
+			refValue, ok := refValueFromVariant(arg, t)
+			if ok {
+				return refValue, nil
 			}
-			log.Debug("ptrcall arg parsed",
-				zap.String("type", "Ref"),
+			log.Panic("failed to parse ref pointer argument",
+				zap.String("type", t.Name()),
 			)
-			return reflect.ValueOf(ref), nil
+			return reflect.Zero(t), nil
 		case t.Implements(gdClassType):
 			obj := arg.ToObject()
 			// NOTE: add .Elem() if we want to support
@@ -315,18 +354,14 @@ func convertVariantToGoTypeReflectValue(arg Variant, t reflect.Type) (reflect.Va
 	case reflect.Struct:
 		switch {
 		case t.Implements(refType):
-			// TODO: is this coming out as a Ref type here?
-			obj := arg.ToObject()
-			ref, ok := obj.(Ref)
-			if !ok {
-				log.Panic("not a ref instance",
-					zap.String("value", arg.Stringify()),
-				)
+			refValue, ok := refValueFromVariant(arg, t)
+			if ok {
+				return refValue, nil
 			}
-			log.Debug("ptrcall arg parsed",
-				zap.String("type", "Ref"),
+			log.Panic("failed to parse ref struct argument",
+				zap.String("type", t.Name()),
 			)
-			return reflect.ValueOf(ref), nil
+			return reflect.Zero(t), nil
 		default:
 			log.Panic("unsupported struct type",
 				zap.Any("type", t),

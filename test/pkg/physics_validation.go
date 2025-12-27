@@ -60,16 +60,22 @@ func (p *PhysicsValidation) ConfigureMaterial(body RigidBody2D, material RefPhys
 		log.Warn("ConfigureMaterial called with invalid material")
 		return false
 	}
+	defer material.Unref()
 	mat := material.TypedPtr()
 	mat.SetFriction(friction)
 	mat.SetBounce(bounce)
-	body.SetPhysicsMaterialOverride(material)
+	propName := NewStringNameWithLatin1Chars("physics_material_override")
+	defer propName.Destroy()
+	propValue := NewVariantGodotObject(mat.GetGodotObjectOwner())
+	body.Set(propName, propValue)
+	propValue.Destroy()
 
 	assigned := body.GetPhysicsMaterialOverride()
 	if assigned == nil || !assigned.IsValid() {
 		log.Warn("ConfigureMaterial failed to read override material")
 		return false
 	}
+	defer assigned.Unref()
 	assignedMat := assigned.TypedPtr()
 	gotFriction := assignedMat.GetFriction()
 	gotBounce := assignedMat.GetBounce()

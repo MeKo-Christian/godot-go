@@ -105,6 +105,22 @@ func (c *Variant) ToObject() Object {
 	return ret
 }
 
+func (c *Variant) ToObjectPtr() *GodotObject {
+	if c.IsNil() {
+		return nil
+	}
+	fn := typeFromVariantConstructor[GDEXTENSION_VARIANT_TYPE_OBJECT]
+	var engineObject *GodotObject
+	engineObjectPtr := &engineObject
+	pnr.Pin(engineObjectPtr)
+	CallFunc_GDExtensionTypeFromVariantConstructorFunc(
+		(GDExtensionTypeFromVariantConstructorFunc)(fn),
+		(GDExtensionUninitializedTypePtr)(engineObjectPtr),
+		c.NativePtr(),
+	)
+	return engineObject
+}
+
 func getObjectInstanceBinding(engineObject *GodotObject) Object {
 	if engineObject == nil {
 		return nil

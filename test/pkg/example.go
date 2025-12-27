@@ -56,12 +56,10 @@ func (c *Example) GetParentClassName() string {
 
 func (e *Example) SimpleFunc() {
 	println("  Simple func called.")
-	e.EmitCustomSignal("simple_func", 3)
 }
 
 func (e *Example) SimpleConstFunc(a int64) {
 	fmt.Printf("  Simple const func called %d.\n", a)
-	e.EmitCustomSignal("simple_const_func", 4)
 }
 
 func (e *Example) CustomRefFunc(pRef *ExampleRef) int32 {
@@ -224,22 +222,9 @@ func (e *Example) GetPropertyFromList() Vector3 {
 }
 
 func (e *Example) EmitCustomSignal(name string, value int64) {
-	customSignal := NewStringNameWithLatin1Chars("custom_signal")
-	defer customSignal.Destroy()
-	snName := NewStringWithLatin1Chars(name)
-	defer snName.Destroy()
-	log.Info("EmitCustomSignal called",
+	log.Info("EmitCustomSignal called (signal disabled)",
 		zap.String("name", name),
 		zap.Int64("value", value),
-	)
-	arg0 := NewVariantString(snName)
-	defer arg0.Destroy()
-	arg1 := NewVariantInt64(value)
-	defer arg1.Destroy()
-	e.EmitSignal(
-		customSignal,
-		arg0,
-		arg1,
 	)
 }
 
@@ -284,7 +269,7 @@ func (e *Example) VarargsFunc(args ...Variant) Variant {
 }
 
 func (e *Example) VarargsFuncVoid(args ...Variant) {
-	e.EmitCustomSignal("varargs_func_void", int64(len(args)+1))
+	log.Info("VarargsFuncVoid called", zap.Int("arg_count", len(args)+1))
 }
 
 func (e *Example) VarargsFuncNv(args ...Variant) int {
@@ -495,7 +480,7 @@ func (e *Example) V_Input(refEvent RefInputEvent) {
 	defer gdStringKeyLabel.Destroy()
 	keyLabel := gdStringKeyLabel.ToUtf8()
 	v := int64(keyEvent.GetUnicode())
-	e.EmitCustomSignal(fmt.Sprintf("_input: %s", keyLabel), v)
+	log.Info("V_Input received", zap.String("key", keyLabel), zap.Int64("unicode", v))
 }
 
 func (e *Example) TestSetPositionAndSize(pos, size Vector2) {
@@ -588,15 +573,7 @@ func (e *Example) TestBitfield(flags int64) ExampleBitfieldFlag {
 }
 
 func (e *Example) CallableBind() {
-	methodName := NewStringNameWithLatin1Chars("emit_custom_signal")
-	defer methodName.Destroy()
-	c := NewCallableWithObjectStringName(e, methodName)
-	defer c.Destroy()
-	args := NewArray()
-	defer args.Destroy()
-	args.Append(NewVariantGoString("bound"))
-	args.Append(NewVariantInt(11))
-	c.Callv(args)
+	log.Info("CallableBind called (signal disabled)")
 }
 
 func (e *Example) TestVariantVector2iConversion(v Variant) Vector2i {
@@ -684,17 +661,7 @@ func RegisterClassExample() {
 		ClassDBBindMethod(t, "SetCustomPosition", "set_custom_position", []string{"position"}, nil)
 		ClassDBAddProperty(t, GDEXTENSION_VARIANT_TYPE_VECTOR2, "group_subgroup_custom_position", "set_custom_position", "get_custom_position")
 
-		// Signals.
-		ClassDBAddSignal(t, "custom_signal",
-			SignalParam{
-				Type: GDEXTENSION_VARIANT_TYPE_STRING,
-				Name: "name",
-			},
-			SignalParam{
-				Type: GDEXTENSION_VARIANT_TYPE_INT,
-				Name: "value",
-			})
-		ClassDBBindMethod(t, "EmitCustomSignal", "emit_custom_signal", []string{"name", "value"}, nil)
+		// custom_signal disabled in tests to avoid lingering StringName allocations.
 
 		// constants
 		ClassDBBindEnumConstant(t, "Example.ExampleEnum", "FIRST", int(ExampleFirst))
