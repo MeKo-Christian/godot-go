@@ -121,10 +121,12 @@ func createNumberEncoder[T Number, E Number](t GDExtensionVariantType) argumentE
 	}
 	encodeReflectVariantPtrArg := func(rv reflect.Value, pOut GDExtensionUninitializedVariantPtr) {
 		v := rv.Interface().(T)
+		// Convert to the encoded type E (e.g., int32 -> int64) for Godot FFI
+		var enc E = (E)(v)
 		CallFunc_GDExtensionVariantFromTypeConstructorFunc(
 			vfn,
 			pOut,
-			(GDExtensionTypePtr)(&v),
+			(GDExtensionTypePtr)(&enc),
 		)
 	}
 	encodeReflectVariantPtr := func(rv reflect.Value) GDExtensionVariantPtr {

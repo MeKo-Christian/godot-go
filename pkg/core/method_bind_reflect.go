@@ -343,8 +343,11 @@ func convertVariantToGoTypeReflectValue(arg Variant, t reflect.Type) (reflect.Va
 			)
 			return reflect.Zero(t), nil
 		case t.Implements(gdClassType):
+			if arg.IsNil() {
+				// Return a nil pointer as a valid reflect.Value
+				return reflect.Zero(t), nil
+			}
 			obj := arg.ToObject()
-			// NOTE: add .Elem() if we want to support
 			return reflect.ValueOf(obj), nil
 		default:
 			log.Panic("unsupported pointer type",
